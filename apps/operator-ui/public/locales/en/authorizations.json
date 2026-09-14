@@ -52,6 +52,16 @@
     "detail": {
       "partner": "Partner",
       "realTimeAuthTimeoutSeconds": "{timeout} seconds"
+    },
+    "attempts": {
+      "registeredTab": "Registered Tags",
+      "attemptsTab": "Attempt Log",
+      "description": "Every Authorize request received from a charging station, and the CSMS response, across all stations.",
+      "station": "Charging Station",
+      "request": "Request",
+      "response": "Response",
+      "idTagOrResult": "ID Tag / Result",
+      "searchIdTag": "Search ID tag"
     }
   }
 }

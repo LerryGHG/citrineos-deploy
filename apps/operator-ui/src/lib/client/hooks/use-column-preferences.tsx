@@ -105,7 +105,8 @@ export const useColumnPreferences = (allColumns: ColumnConfiguration[], resource
     );
   };
 
-  const renderedVisibleColumns = convertToTableColumns(finalColumns.filter((c) => c.visible));
+  const visibleColumns = finalColumns.filter((c) => c.visible);
+  const renderedVisibleColumns = convertToTableColumns(visibleColumns);
 
   const columnSelector = (
     <Popover>
@@ -144,5 +145,6 @@ export const useColumnPreferences = (allColumns: ColumnConfiguration[], resource
   return {
     columnSelector,
     renderedVisibleColumns,
+    visibleColumns,
   };
 };

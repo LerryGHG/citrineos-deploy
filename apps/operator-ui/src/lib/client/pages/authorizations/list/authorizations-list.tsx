@@ -6,6 +6,8 @@
 import { MenuSection } from '@lib/client/components/main-menu/main-menu';
 import { Table } from '@lib/client/components/table';
 import { Button } from '@lib/client/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@lib/client/components/ui/tabs';
+import { AuthorizationAttempts } from '@lib/client/pages/authorizations/list/authorization-attempts';
 import {
   getAuthorizationsColumns,
   getAuthorizationFilters,
@@ -47,56 +49,78 @@ export const AuthorizationsList = () => {
 
   return (
     <div className={`${pageMargin} ${tableWrapperStyle}`}>
-      <div className={tableHeaderWrapperFlex}>
-        <h2 className={heading2Style}>{translate('Authorizations.Authorizations')}</h2>
-        <div className={tableSearchFlex}>
-          <CanAccess resource={ResourceType.AUTHORIZATIONS} action={ActionType.CREATE}>
-            <Button variant="success" onClick={() => push(`/${MenuSection.AUTHORIZATIONS}/new`)}>
-              <Plus className={buttonIconSize} />
-              {translate('buttons.add')} {translate('Authorizations.authorization')}
-            </Button>
+      <h2 className={heading2Style}>{translate('Authorizations.Authorizations')}</h2>
+      <Tabs defaultValue="registered">
+        <TabsList>
+          <TabsTrigger value="registered">
+            {translate('Authorizations.attempts.registeredTab', 'Registered Tags')}
+          </TabsTrigger>
+          <TabsTrigger value="attempts">
+            {translate('Authorizations.attempts.attemptsTab', 'Attempt Log')}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="registered" className="flex flex-col gap-4">
+          <div className={tableHeaderWrapperFlex}>
+            <div />
+            <div className={tableSearchFlex}>
+              <CanAccess resource={ResourceType.AUTHORIZATIONS} action={ActionType.CREATE}>
+                <Button variant="success" onClick={() => push(`/${MenuSection.AUTHORIZATIONS}/new`)}>
+                  <Plus className={buttonIconSize} />
+                  {translate('buttons.add')} {translate('Authorizations.authorization')}
+                </Button>
+              </CanAccess>
+              <CanAccess resource={ResourceType.AUTHORIZATIONS} action={ActionType.LIST}>
+                {columnSelector}
+                <DebounceSearch
+                  onSearch={onSearch}
+                  placeholder={`${translate('placeholders.search')} ${translate('Authorizations.authorization')}`}
+                />
+              </CanAccess>
+            </div>
+          </div>
+          <CanAccess
+            resource={ResourceType.AUTHORIZATIONS}
+            action={ActionType.LIST}
+            fallback={<AccessDeniedFallback />}
+          >
+            <Table<AuthorizationDto>
+              refineCoreProps={{
+                resource: ResourceType.AUTHORIZATIONS,
+                sorters: {
+                  initial: [{ field: AuthorizationProps.idToken, order: 'asc' }],
+                },
+                filters: {
+                  permanent: filters,
+                },
+                meta: {
+                  gqlQuery: AUTHORIZATIONS_LIST_QUERY,
+                },
+                queryOptions: {
+                  ...getPlainToInstanceOptions(AuthorizationClass),
+                  select: (data: any) => {
+                    return data;
+                  },
+                },
+              }}
+              enableSorting
+              enableFilters
+              showHeader
+              tableStateKey={ResourceType.AUTHORIZATIONS}
+            >
+              {renderedVisibleColumns}
+            </Table>
           </CanAccess>
-          <CanAccess resource={ResourceType.AUTHORIZATIONS} action={ActionType.LIST}>
-            {columnSelector}
-            <DebounceSearch
-              onSearch={onSearch}
-              placeholder={`${translate('placeholders.search')} ${translate('Authorizations.authorization')}`}
-            />
+        </TabsContent>
+        <TabsContent value="attempts">
+          <CanAccess
+            resource={ResourceType.OCPP_MESSAGES}
+            action={ActionType.LIST}
+            fallback={<AccessDeniedFallback />}
+          >
+            <AuthorizationAttempts />
           </CanAccess>
-        </div>
-      </div>
-      <CanAccess
-        resource={ResourceType.AUTHORIZATIONS}
-        action={ActionType.LIST}
-        fallback={<AccessDeniedFallback />}
-      >
-        <Table<AuthorizationDto>
-          refineCoreProps={{
-            resource: ResourceType.AUTHORIZATIONS,
-            sorters: {
-              initial: [{ field: AuthorizationProps.idToken, order: 'asc' }],
-            },
-            filters: {
-              permanent: filters,
-            },
-            meta: {
-              gqlQuery: AUTHORIZATIONS_LIST_QUERY,
-            },
-            queryOptions: {
-              ...getPlainToInstanceOptions(AuthorizationClass),
-              select: (data: any) => {
-                return data;
-              },
-            },
-          }}
-          enableSorting
-          enableFilters
-          showHeader
-          tableStateKey={ResourceType.AUTHORIZATIONS}
-        >
-          {renderedVisibleColumns}
-        </Table>
-      </CanAccess>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

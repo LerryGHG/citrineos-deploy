@@ -19,6 +19,14 @@ export const defaultLatitude = 36.7783;
 export const defaultLongitude = -119.4179;
 const defaultZoom = 15;
 
+// The .env.local template ships this as a literal placeholder. Without a
+// real key, @vis.gl/react-google-maps throws an uncaught error deep inside
+// Google's own script (outside React's render call stack, so an error
+// boundary can't catch it either) and takes down the whole page. Since the
+// form already has manual lat/lng inputs as a fallback, just skip loading
+// the map entirely rather than crash.
+const PLACEHOLDER_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+
 /**
  * MapLocationPicker component that allows selecting a location on the map
  */
@@ -67,9 +75,21 @@ export const MapLocationPicker: React.FC<LocationPickerMapProps> = ({
     }
   };
 
-  return apiKey === undefined ? (
-    <Skeleton className="size=full" />
-  ) : (
+  const isMapsConfigured = !!apiKey && apiKey !== PLACEHOLDER_API_KEY;
+
+  if (apiKey === undefined) {
+    return <Skeleton className="size=full" />;
+  }
+
+  if (!isMapsConfigured) {
+    return (
+      <div className="size-full flex items-center justify-center rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground text-center">
+        Map unavailable: no Google Maps API key configured. Enter latitude/longitude manually.
+      </div>
+    );
+  }
+
+  return (
     <div className="size-full">
       <APIProvider apiKey={apiKey ?? ''}>
         <Map

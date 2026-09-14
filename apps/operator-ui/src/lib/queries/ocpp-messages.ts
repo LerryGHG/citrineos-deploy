@@ -39,6 +39,38 @@ export const GET_OCPP_MESSAGES_LIST_FOR_STATION = gql`
   }
 `;
 
+// Station-agnostic variant of GET_OCPP_MESSAGES_LIST_FOR_STATION, used by views
+// (e.g. the Authorization Attempts tab) that need to see messages across every
+// charging station rather than one specific station.
+export const GET_OCPP_MESSAGES_LIST = gql`
+  query GetOCPPMessagesList(
+    $where: [OCPPMessages_bool_exp!] = []
+    $order_by: [OCPPMessages_order_by!] = {}
+    $offset: Int
+    $limit: Int
+  ) {
+    OCPPMessages(where: { _and: $where }, order_by: $order_by, offset: $offset, limit: $limit) {
+      id
+      ocppConnectionName
+      correlationId
+      origin
+      type
+      protocol
+      action
+      payload
+      raw
+      timestamp
+      createdAt
+      updatedAt
+    }
+    OCPPMessages_aggregate(where: { _and: $where }) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
 export const GET_OCPP_MESSAGES_FOR_TRANSACTION_LIST_QUERY = gql`
   query OCPPMessageList(
     $ocppTransactionId: Int

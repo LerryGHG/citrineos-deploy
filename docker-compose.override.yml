@@ -1,0 +1,35 @@
+# Local port remap to avoid clashing with an unrelated "ocpp-simulate"
+# container that also uses 3000 on this host.
+# `!override` fully replaces the base ports list instead of appending to it.
+services:
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+  minio-init:
+    image: quay.io/minio/mc:latest
+  graphql-engine:
+    # The cli-migrations variant's entrypoint spins up a temporary internal
+    # server on :9691 and polls it over localhost to apply migrations before
+    # starting the real server; on this host that self-poll never succeeds
+    # within its 30s window and the container restart-loops forever. This repo
+    # only mounts Hasura *metadata* (not SQL migrations), so the migrations
+    # wrapper isn't needed — use the plain image instead.
+    image: hasura/graphql-engine:v2.40.3
+    environment:
+      # The operator UI's data-provider already sends x-hasura-admin-secret
+      # (read from apps/operator-ui/.env.local's HASURA_ADMIN_SECRET) to get
+      # the real Hasura superadmin bypass. But the base compose file never
+      # configures a secret here, so Hasura had nothing to check that header
+      # against and fell back to enforcing role permissions — and the seeded
+      # metadata only defines permissions for a role named "user", never
+      # "admin", so the admin login could pass login but every mutation
+      # (e.g. creating a charging station) was denied. Setting the same
+      # secret here restores the intended superadmin bypass.
+      HASURA_GRAPHQL_ADMIN_SECRET: 'CitrineOS!'
+  citrine-ui:
+    ports: !override
+      - "3010:3000"
+    # The base file sets pull_policy: always, which re-pulls and clobbers a
+    # locally-built image sharing the same tag. Pin to the local image once
+    # `docker compose -f docker-compose.yml -f docker-compose.local.yml build
+    # citrine-ui` has been run (see docker-compose.local.yml).
+    pull_policy: never

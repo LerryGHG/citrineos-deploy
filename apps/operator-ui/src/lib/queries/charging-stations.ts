@@ -219,6 +219,26 @@ export const GET_CHARGING_STATIONS_WITH_LOCATION_AND_LATEST_STATUS_NOTIFICATIONS
   }
 `;
 
+export const GET_CHARGING_STATIONS_OVERVIEW_GRID = gql`
+  query GetChargingStationsOverviewGrid {
+    ChargingStations {
+      ${CHARGING_STATION_CORE_FIELDS}
+      latestStatusNotifications: LatestStatusNotifications {
+        statusNotification: StatusNotification {
+          ${STATUS_NOTIFICATION_FIELDS}
+        }
+      }
+      transactions: Transactions(where: { isActive: { _eq: true } }) {
+        ${ACTIVE_TRANSACTION_FIELDS}
+        latestMeterValue: MeterValues(order_by: { timestamp: desc }, limit: 1) {
+          sampledValue
+          timestamp
+        }
+      }
+    }
+  }
+`;
+
 export const CHARGING_STATION_ONLINE_STATUS_QUERY = gql`
   query ChargingStationOnlineStatus($id: Int!) {
     ChargingStations_by_pk(id: $id) {

@@ -1,0 +1,3 @@
+version: 3
+endpoint: http://graphql-engine:8080
+metadata_directory: hasura-metadata

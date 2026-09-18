@@ -25,7 +25,32 @@ services:
       # (e.g. creating a charging station) was denied. Setting the same
       # secret here restores the intended superadmin bypass.
       HASURA_GRAPHQL_ADMIN_SECRET: 'CitrineOS!'
+  # The plain image swapped in above never auto-applies Hasura metadata on
+  # startup the way the cli-migrations variant normally would (that's its
+  # whole job — see the comment on graphql-engine). On a brand-new database
+  # this leaves zero tables tracked in Hasura (GraphQL queries return
+  # "no_queries_available") until someone applies it by hand, which is a trap
+  # for the next fresh deploy. This one-shot container does it automatically
+  # on every `up`, using the cli-migrations image's own bundled `hasura-cli`
+  # binary against the already-running plain server — idempotent, safe to
+  # re-run against a database that's already had it applied.
+  hasura-metadata-init:
+    image: hasura/graphql-engine:v2.40.3.cli-migrations-v3
+    entrypoint: ['hasura-cli']
+    command: ['metadata', 'apply', '--admin-secret', 'CitrineOS!', '--skip-update-check']
+    working_dir: /project
+    volumes:
+      - ./apps/ocpp-server/config.yaml:/project/config.yaml
+      - ./apps/ocpp-server/hasura-metadata:/project/hasura-metadata
+    depends_on:
+      citrine:
+        condition: service_healthy
+      graphql-engine:
+        condition: service_healthy
   citrine-ui:
+    depends_on:
+      hasura-metadata-init:
+        condition: service_completed_successfully
     ports: !override
       - "3010:3000"
     # The base file sets pull_policy: always, which re-pulls and clobbers a

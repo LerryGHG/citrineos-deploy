@@ -48,6 +48,9 @@ dist
 # Server data
 /apps/ocpp-server/data
 
+# Database dumps from scripts/backup-db.sh — contain real data, never commit
+/backups
+
 # IntelliJ
 out/
 

@@ -19,6 +19,12 @@
     "location": "Local:",
     "totalKwh": "Total kWh: {value}",
     "totalTime": "Tempo total: {value}",
-    "transactionStatus": "Status: {value}"
+    "transactionStatus": "Status: {value}",
+    "stations": "Estações",
+    "noStations": "Nenhuma estação encontrada.",
+    "currentDraw": "{value} A",
+    "notCharging": "Não carregando",
+    "unknown": "Desconhecido",
+    "offline": "Offline"
   }
 }

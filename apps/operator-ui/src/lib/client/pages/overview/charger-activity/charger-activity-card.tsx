@@ -147,7 +147,7 @@ const getOnlineStatusCountsForStation = (
   return counts;
 };
 
-function connectorStatusToChargerStatus(
+export function connectorStatusToChargerStatus(
   connectorStatus: ConnectorStatusEnumType | string,
 ): ChargerStatusEnum {
   switch (connectorStatus) {

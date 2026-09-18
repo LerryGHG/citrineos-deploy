@@ -35,10 +35,11 @@ const statusPriority: Record<ChargerStatusEnum, number> = {
   [ChargerStatusEnum.AVAILABLE]: 1,
   [ChargerStatusEnum.CHARGING]: 2,
   [ChargerStatusEnum.CHARGING_SUSPENDED]: 3,
-  [ChargerStatusEnum.UNAVAILABLE]: 4,
-  [ChargerStatusEnum.FAULTED]: 5,
-  [ChargerStatusEnum.OFFLINE]: 6,
-  [ChargerStatusEnum.ONLINE]: 7,
+  [ChargerStatusEnum.PREPARING]: 4,
+  [ChargerStatusEnum.UNAVAILABLE]: 5,
+  [ChargerStatusEnum.FAULTED]: 6,
+  [ChargerStatusEnum.OFFLINE]: 7,
+  [ChargerStatusEnum.ONLINE]: 8,
 };
 
 interface OnlineStatusCounts {
@@ -47,6 +48,7 @@ interface OnlineStatusCounts {
     count: number;
     items: Array<ChargerItem>;
   };
+  [ChargerStatusEnum.PREPARING]: { count: number; items: Array<ChargerItem> };
   [ChargerStatusEnum.AVAILABLE]: { count: number; items: Array<ChargerItem> };
   [ChargerStatusEnum.UNAVAILABLE]: { count: number; items: Array<ChargerItem> };
   [ChargerStatusEnum.FAULTED]: { count: number; items: Array<ChargerItem> };
@@ -67,6 +69,7 @@ const aggregateOnlineStatusCounts = (
 const getNewCounts = (): OnlineStatusCounts => ({
   [ChargerStatusEnum.CHARGING]: { count: 0, items: [] },
   [ChargerStatusEnum.CHARGING_SUSPENDED]: { count: 0, items: [] },
+  [ChargerStatusEnum.PREPARING]: { count: 0, items: [] },
   [ChargerStatusEnum.AVAILABLE]: { count: 0, items: [] },
   [ChargerStatusEnum.UNAVAILABLE]: { count: 0, items: [] },
   [ChargerStatusEnum.FAULTED]: { count: 0, items: [] },
@@ -151,23 +154,21 @@ function connectorStatusToChargerStatus(
     case ConnectorStatusEnum.Available:
       return ChargerStatusEnum.AVAILABLE;
 
+    // Cable plugged in / session ending, but no power is being delivered yet
+    // (or anymore) — distinct from an actual in-progress charge.
     case ConnectorStatusEnum.Preparing:
-    case ConnectorStatusEnum.Charging:
     case ConnectorStatusEnum.Finishing:
+      return ChargerStatusEnum.PREPARING;
+
+    case ConnectorStatusEnum.Charging:
+      return ChargerStatusEnum.CHARGING;
+
+    // A transaction is active but currently not drawing power (EV not ready,
+    // or EVSE-side hold) — still "in a session," just not actively charging.
     case ConnectorStatusEnum.SuspendedEV:
     case ConnectorStatusEnum.SuspendedEVSE:
     case 'Occupied': // To handle possible string enum from different OCPP versions
-      // const activeTx = chargingStation.transactions?.find(
-      //   (tx: TransactionDto) => tx.evseId === evse.id,
-      // );
-      // if (activeTx) {
-      //   if (activeTx.chargingState === ChargingStateEnumType.Charging) {
-      //     return ChargerStatusEnum.CHARGING;
-      //   } else {
-      //     return ChargerStatusEnum.CHARGING_SUSPENDED;
-      //   }
-      // }
-      return ChargerStatusEnum.CHARGING;
+      return ChargerStatusEnum.CHARGING_SUSPENDED;
 
     case ConnectorStatusEnum.Faulted:
       return ChargerStatusEnum.FAULTED;
@@ -242,6 +243,8 @@ export const ChargerActivityCard: React.FC = () => {
             <div className="flex gap-2">
               {[
                 ChargerStatusEnum.CHARGING,
+                ChargerStatusEnum.CHARGING_SUSPENDED,
+                ChargerStatusEnum.PREPARING,
                 ChargerStatusEnum.AVAILABLE,
                 ChargerStatusEnum.UNAVAILABLE,
                 ChargerStatusEnum.FAULTED,
@@ -282,6 +285,7 @@ export const getStatusColor: any = {
   [ChargerStatusEnum.UNAVAILABLE]: 'text-warning',
   [ChargerStatusEnum.CHARGING]: 'text-secondary',
   [ChargerStatusEnum.CHARGING_SUSPENDED]: 'text-warning',
+  [ChargerStatusEnum.PREPARING]: 'text-primary',
   [ChargerStatusEnum.FAULTED]: 'text-muted-foreground',
   [ChargerStatusEnum.ONLINE]: 'text-success',
   [ChargerStatusEnum.OFFLINE]: 'text-destructive',

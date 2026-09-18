@@ -83,6 +83,7 @@ export enum DisallowedEvseIdPrefixes {
 export enum ChargerStatusEnum {
   CHARGING = 'Charging',
   CHARGING_SUSPENDED = 'Charging Suspended',
+  PREPARING = 'Preparing',
   AVAILABLE = 'Available',
   UNAVAILABLE = 'Unavailable',
   FAULTED = 'Faulted',

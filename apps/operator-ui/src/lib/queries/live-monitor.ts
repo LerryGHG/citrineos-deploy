@@ -11,7 +11,7 @@ export const LIVE_MONITOR_METER_VALUES_QUERY = gql`
     MeterValues(
       where: { Transaction: { isActive: { _eq: true } } }
       order_by: { timestamp: desc }
-      limit: 300
+      limit: 600
     ) {
       id
       timestamp

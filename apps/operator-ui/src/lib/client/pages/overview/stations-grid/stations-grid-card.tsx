@@ -23,9 +23,14 @@ import {
   connectorStatusToChargerStatus,
   getStatusColor,
 } from '@lib/client/pages/overview/charger-activity/charger-activity-card';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useCardLabels } from '@lib/client/hooks/use-card-labels';
+import { useLiveCurrent } from '@lib/client/hooks/use-live-current';
 
 const REFRESH_MS = 5000;
+
+const formatClock = (t: number) =>
+  new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 // Loose shapes matching exactly what GET_CHARGING_STATIONS_OVERVIEW_GRID returns —
 // deliberately not run through the ChargingStationClass/plainToInstance pipeline, since
@@ -88,6 +93,7 @@ export const StationsGridCard: React.FC = () => {
   const { push } = useRouter();
   const translate = useTranslate();
   const { describe } = useCardLabels();
+  const { pointsByStation, colorFor } = useLiveCurrent();
 
   // Re-render every 30 s so the running time keeps counting between data refreshes.
   const [now, setNow] = useState(() => Date.now());
@@ -189,7 +195,8 @@ export const StationsGridCard: React.FC = () => {
                           : translate('Overview.stationOffline')}
                       </div>
                     ) : (
-                      sessions.map((transaction) => {
+                      <>
+                      {sessions.map((transaction) => {
                         const idToken = transaction.authorization?.idToken;
                         const card = idToken ? describe(idToken) : null;
                         const amps = getCurrentAmps(transaction);
@@ -220,7 +227,57 @@ export const StationsGridCard: React.FC = () => {
                             </div>
                           </div>
                         );
-                      })
+                      })}
+                      {(() => {
+                        const points = pointsByStation.get(station.ocppConnectionName) ?? [];
+                        if (points.length < 2) return null;
+                        const color = colorFor(station.ocppConnectionName);
+                        const gradientId = `spark-${station.id}`;
+                        return (
+                          <div className="h-12 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <AreaChart data={points} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
+                                <defs>
+                                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+                                    <stop offset="100%" stopColor={color} stopOpacity={0} />
+                                  </linearGradient>
+                                </defs>
+                                <XAxis
+                                  dataKey="t"
+                                  type="number"
+                                  domain={['dataMin', 'dataMax']}
+                                  hide
+                                />
+                                <YAxis hide domain={[0, (max: number) => Math.max(max * 1.15, 1)]} />
+                                <Tooltip
+                                  labelFormatter={(t) => formatClock(Number(t))}
+                                  formatter={(value) => [`${Number(value).toFixed(1)} A`, '']}
+                                  separator=""
+                                  contentStyle={{
+                                    fontSize: 12,
+                                    backgroundColor: 'var(--popover)',
+                                    color: 'var(--card-foreground)',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 6,
+                                  }}
+                                  labelStyle={{ color: 'var(--muted-foreground)' }}
+                                />
+                                <Area
+                                  type="monotone"
+                                  dataKey="amps"
+                                  stroke={color}
+                                  strokeWidth={2}
+                                  fill={`url(#${gradientId})`}
+                                  dot={false}
+                                  isAnimationActive={false}
+                                />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          </div>
+                        );
+                      })()}
+                      </>
                     )}
                   </div>
                 );

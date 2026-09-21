@@ -3,23 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 'use client';
 
-import React, { useMemo } from 'react';
-import { OCPP2_0_1 } from '@citrineos/types';
+import React from 'react';
 import { CanAccess, useTranslate } from '@refinedev/core';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader } from '@lib/client/components/ui/card';
 import { AccessDeniedFallbackCard } from '@lib/client/components/access-denied-fallback-card';
 import { OverviewCardSkeleton } from '@lib/client/pages/overview/overview-card-skeleton';
-import { findOverallValue, normalizeValue } from '@lib/cls/meter-value-dto';
-import { LIVE_MONITOR_METER_VALUES_QUERY } from '@lib/queries/live-monitor';
+import { useLiveCurrent } from '@lib/client/hooks/use-live-current';
 import { ActionType, ResourceType } from '@lib/utils/access-types';
-import { useGqlCustom } from '@lib/utils/use-gql-custom';
 import { heading2Style } from '@lib/client/styles/page';
 
-const WINDOW_MS = 15 * 60 * 1000;
-const REFRESH_MS = 5000;
 const NOMINAL_VOLTS = 230;
-const COLORS = ['#f5a524', '#3b82f6', '#22c55e', '#ef4444', '#a855f7', '#14b8a6'];
 
 const formatClock = (t: number, withSeconds = false) =>
   new Date(t).toLocaleTimeString([], {
@@ -30,54 +24,7 @@ const formatClock = (t: number, withSeconds = false) =>
 
 export const LiveMonitorCard: React.FC = () => {
   const translate = useTranslate();
-
-  const {
-    query: { data, isLoading, error },
-  } = useGqlCustom({
-    gqlQuery: LIVE_MONITOR_METER_VALUES_QUERY,
-    queryOptions: { refetchInterval: REFRESH_MS },
-  });
-
-  const rows = useMemo(() => ((data?.data as any)?.MeterValues ?? []) as any[], [data]);
-
-  const { chartData, stations, latest } = useMemo(() => {
-    const cutoff = Date.now() - WINDOW_MS;
-    const byTime = new Map<number, Record<string, number>>();
-    const latestByStation = new Map<string, { t: number; amps: number }>();
-    const names: string[] = [];
-
-    for (const row of rows) {
-      const t = new Date(row.timestamp).getTime();
-      if (Number.isNaN(t) || t < cutoff || !row.sampledValue) continue;
-      const overall = findOverallValue(row.sampledValue, OCPP2_0_1.MeasurandEnumType.Current_Import);
-      if (!overall) continue;
-      const normalized = normalizeValue(overall);
-      if (normalized === null) continue;
-      const amps = Number(normalized);
-      const station: string = row.transaction?.ocppConnectionName ?? '?';
-      if (!names.includes(station)) names.push(station);
-
-      const bucket = byTime.get(t) ?? {};
-      bucket[station] = amps;
-      byTime.set(t, bucket);
-
-      const prev = latestByStation.get(station);
-      if (!prev || t > prev.t) latestByStation.set(station, { t, amps });
-    }
-
-    // Stations report at their own moments, so any one timestamp only has a value for one
-    // of them. Carry each station's last reading forward so every point (and therefore the
-    // hover tooltip) has all stations.
-    const lastKnown: Record<string, number> = {};
-    const chartData = Array.from(byTime.entries())
-      .sort((a, b) => a[0] - b[0])
-      .map(([t, values]) => {
-        Object.assign(lastKnown, values);
-        return { t, ...lastKnown };
-      });
-
-    return { chartData, stations: names.sort(), latest: latestByStation };
-  }, [rows]);
+  const { chartData, stations, latest, colorFor, isLoading, error } = useLiveCurrent();
 
   if (isLoading) return <OverviewCardSkeleton />;
 
@@ -102,9 +49,7 @@ export const LiveMonitorCard: React.FC = () => {
             {stations.length > 0 && (
               <div className="text-right">
                 <div className="text-lg font-semibold">{totalAmps.toFixed(1)} A</div>
-                <div className="text-xs text-muted-foreground">
-                  ≈ {approxKw.toFixed(2)} kW
-                </div>
+                <div className="text-xs text-muted-foreground">≈ {approxKw.toFixed(2)} kW</div>
               </div>
             )}
           </div>
@@ -143,12 +88,12 @@ export const LiveMonitorCard: React.FC = () => {
                       }}
                       labelStyle={{ color: 'var(--muted-foreground)' }}
                     />
-                    {stations.map((station, index) => (
+                    {stations.map((station) => (
                       <Line
                         key={station}
                         type="monotone"
                         dataKey={station}
-                        stroke={COLORS[index % COLORS.length]}
+                        stroke={colorFor(station)}
                         strokeWidth={2}
                         dot={false}
                         connectNulls
@@ -159,11 +104,11 @@ export const LiveMonitorCard: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                {stations.map((station, index) => (
+                {stations.map((station) => (
                   <span key={station} className="flex items-center gap-1">
                     <span
                       className="inline-block size-2 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      style={{ backgroundColor: colorFor(station) }}
                     />
                     {station}: {latest.get(station)?.amps.toFixed(1)} A
                   </span>

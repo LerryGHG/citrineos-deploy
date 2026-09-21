@@ -10,6 +10,8 @@ import type { DocumentNode, OperationDefinitionNode } from 'graphql';
 interface UseGqlCustomProps {
   gqlQuery: DocumentNode;
   variables?: Record<string, any>;
+  /** e.g. { refetchInterval: 5000 } for a self-refreshing widget */
+  queryOptions?: { refetchInterval?: number };
 }
 
 const getOperationNameFromQuery = (gqlQuery: DocumentNode): string | undefined => {
@@ -19,7 +21,11 @@ const getOperationNameFromQuery = (gqlQuery: DocumentNode): string | undefined =
   return operationDef?.name?.value;
 };
 
-export const useGqlCustom = <T extends BaseRecord>({ gqlQuery, variables }: UseGqlCustomProps) => {
+export const useGqlCustom = <T extends BaseRecord>({
+  gqlQuery,
+  variables,
+  queryOptions,
+}: UseGqlCustomProps) => {
   const operation = getOperationNameFromQuery(gqlQuery);
 
   if (!operation) {
@@ -39,5 +45,6 @@ export const useGqlCustom = <T extends BaseRecord>({ gqlQuery, variables }: UseG
       gqlQuery,
       variables,
     },
+    queryOptions,
   });
 };

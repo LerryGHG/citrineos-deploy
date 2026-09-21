@@ -21,6 +21,8 @@
     "totalTime": "Total Time: {value}",
     "transactionStatus": "Status: {value}",
     "stations": "Stations",
+    "liveMonitor": "Live Monitor",
+    "noActiveSessions": "No active charging sessions.",
     "noStations": "No stations found.",
     "currentDraw": "{value} A",
     "notCharging": "Not charging",

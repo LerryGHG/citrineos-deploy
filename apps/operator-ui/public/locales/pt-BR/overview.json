@@ -21,6 +21,8 @@
     "totalTime": "Tempo total: {value}",
     "transactionStatus": "Status: {value}",
     "stations": "Estações",
+    "liveMonitor": "Monitor ao vivo",
+    "noActiveSessions": "Nenhuma sessão de carregamento ativa.",
     "noStations": "Nenhuma estação encontrada.",
     "currentDraw": "{value} A",
     "notCharging": "Não carregando",

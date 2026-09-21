@@ -7,7 +7,7 @@ import { ActiveTransactionsCard } from '@lib/client/pages/overview/active-transa
 import { ChargerActivityCard } from '@lib/client/pages/overview/charger-activity/charger-activity-card';
 import { StationsGridCard } from '@lib/client/pages/overview/stations-grid/stations-grid-card';
 import { OnlineStatusCard } from '@lib/client/pages/overview/online-status/online-status-card';
-import { PluginSuccessRateCard } from '@lib/client/pages/overview/plugin-success-rate/plugin-success-rate-card';
+import { LiveMonitorCard } from '@lib/client/pages/overview/live-monitor/live-monitor-card';
 
 export const Overview = () => {
   return (
@@ -15,7 +15,7 @@ export const Overview = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <OnlineStatusCard />
         <ChargerActivityCard />
-        <PluginSuccessRateCard />
+        <LiveMonitorCard />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
         <div className="lg:col-span-5 w-full h-150">

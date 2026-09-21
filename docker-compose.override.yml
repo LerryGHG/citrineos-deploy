@@ -34,6 +34,22 @@ services:
   # on every `up`, using the cli-migrations image's own bundled `hasura-cli`
   # binary against the already-running plain server — idempotent, safe to
   # re-run against a database that's already had it applied.
+  # Creates the small CardLabels table (friendly names for RFID cards) used by
+  # the operator UI's Cars tab. Idempotent; must finish before Hasura metadata
+  # is applied, because that metadata tracks this table.
+  cardlabels-init:
+    image: postgis/postgis:16-3.5
+    entrypoint: ['psql']
+    command: ['-v', 'ON_ERROR_STOP=1', '-h', 'ocpp-db', '-U', 'citrine', '-d', 'citrine', '-f', '/sql/card-labels.sql']
+    environment:
+      PGPASSWORD: citrine
+    volumes:
+      - ./apps/ocpp-server/sql:/sql:ro
+    depends_on:
+      ocpp-db:
+        condition: service_healthy
+      citrine:
+        condition: service_healthy
   hasura-metadata-init:
     image: hasura/graphql-engine:v2.40.3.cli-migrations-v3
     entrypoint: ['hasura-cli']
@@ -47,6 +63,8 @@ services:
         condition: service_healthy
       graphql-engine:
         condition: service_healthy
+      cardlabels-init:
+        condition: service_completed_successfully
   citrine-ui:
     depends_on:
       hasura-metadata-init:

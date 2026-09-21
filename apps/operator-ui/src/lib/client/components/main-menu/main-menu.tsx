@@ -96,7 +96,7 @@ export const MainMenu = ({ activeSection }: MainMenuProps) => {
     },
     {
       key: `/${MenuSection.PARTNERS}`,
-      label: translate('TenantPartners.TenantPartners'),
+      label: translate('Cars.menuLabel'),
       icon: <Users className={sidebarIconSize} />,
     },
   ];

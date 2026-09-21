@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { PartnersList } from '@lib/client/pages/partners/list/partners-list';
+import { CarsList } from '@lib/client/pages/cars/cars-list';
 
-export default function ListPartnerPage() {
-  return <PartnersList />;
+export default function CarsPage() {
+  return <CarsList />;
 }

@@ -4,6 +4,7 @@
 - '!include public_AsyncJobStatuses.yaml'
 - '!include public_Authorizations.yaml'
 - '!include public_Boots.yaml'
+- '!include public_CardLabels.yaml'
 - '!include public_Certificates.yaml'
 - '!include public_ChangeConfigurations.yaml'
 - '!include public_ChargingNeeds.yaml'

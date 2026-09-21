@@ -29,6 +29,7 @@
     "noStations": "No stations found.",
     "currentDraw": "{value} A",
     "notCharging": "Not charging",
+    "batteryLevel": "Battery level",
     "unknown": "Unknown",
     "offline": "Offline"
   }

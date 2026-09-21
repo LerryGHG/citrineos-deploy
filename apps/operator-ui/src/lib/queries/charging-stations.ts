@@ -234,7 +234,7 @@ export const GET_CHARGING_STATIONS_OVERVIEW_GRID = gql`
         authorization: Authorization {
           idToken
         }
-        latestMeterValue: MeterValues(order_by: { timestamp: desc }, limit: 1) {
+        latestMeterValue: MeterValues(order_by: { timestamp: desc }, limit: 5) {
           sampledValue
           timestamp
         }

@@ -14,7 +14,7 @@ import { CanAccess, useTranslate } from '@refinedev/core';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@lib/client/components/ui/card';
 import { Badge } from '@lib/client/components/ui/badge';
-import { ChevronRightIcon, ClockIcon, ZapIcon } from 'lucide-react';
+import { BatteryChargingIcon, ChevronRightIcon, ClockIcon, ZapIcon } from 'lucide-react';
 import { heading2Style } from '@lib/client/styles/page';
 import { overviewClickableStyle } from '@lib/client/styles/card';
 import { OverviewCardSkeleton } from '@lib/client/pages/overview/overview-card-skeleton';
@@ -61,17 +61,34 @@ interface GridStation {
 const getLatestConnectorStatus = (station: GridStation): string | undefined =>
   station.latestStatusNotifications?.[0]?.statusNotification?.connectorStatus ?? undefined;
 
+// Chargers may report different measurands in different meter values, so look through the
+// most recent few (newest first) for the first one that has the requested measurand.
+const latestReading = (transaction: GridTransaction, measurand: OCPP2_0_1.MeasurandEnumType) => {
+  for (const meterValue of transaction.latestMeterValue ?? []) {
+    if (!meterValue?.sampledValue) continue;
+    const found = findOverallValue(meterValue.sampledValue as any, measurand);
+    if (found) return found;
+  }
+  return undefined;
+};
+
 const getCurrentAmps = (transaction: GridTransaction): number | null => {
-  const meterValue = transaction.latestMeterValue?.[0];
-  if (!meterValue?.sampledValue) return null;
-  const overall = findOverallValue(
-    meterValue.sampledValue as any,
-    OCPP2_0_1.MeasurandEnumType.Current_Import,
-  );
-  if (!overall) return null;
-  const normalized = normalizeValue(overall);
+  const reading = latestReading(transaction, OCPP2_0_1.MeasurandEnumType.Current_Import);
+  if (!reading) return null;
+  const normalized = normalizeValue(reading);
   return normalized !== null ? Number(normalized) : null;
 };
+
+// Battery level (state of charge) in percent, only when the charger reports it.
+const getBatteryPercent = (transaction: GridTransaction): number | null => {
+  const reading = latestReading(transaction, OCPP2_0_1.MeasurandEnumType.SoC);
+  if (!reading) return null;
+  const value = Number(reading.value);
+  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : null;
+};
+
+const batteryColor = (percent: number): string =>
+  percent < 20 ? 'text-destructive' : percent < 50 ? 'text-warning' : 'text-success';
 
 const formatElapsed = (startTime: string | null | undefined, now: number): string | null => {
   if (!startTime) return null;
@@ -177,15 +194,33 @@ export const StationsGridCard: React.FC = () => {
                         )}
                         <span className="truncate font-semibold">{station.ocppConnectionName}</span>
                       </div>
-                      {!station.isOnline ? (
-                        <Badge variant="muted">{translate('Overview.offline')}</Badge>
-                      ) : chargerStatus ? (
-                        <Badge variant="outline" className={getStatusColor[chargerStatus]}>
-                          {chargerStatus}
-                        </Badge>
-                      ) : (
-                        <Badge variant="muted">{translate('Overview.unknown')}</Badge>
-                      )}
+                      <div className="flex shrink-0 items-center gap-2">
+                        {(() => {
+                          const percents = sessions
+                            .map(getBatteryPercent)
+                            .filter((p): p is number => p !== null);
+                          if (percents.length === 0) return null;
+                          const percent = Math.max(...percents);
+                          return (
+                            <span
+                              className={`flex items-center gap-1 text-sm font-medium ${batteryColor(percent)}`}
+                              title={translate('Overview.batteryLevel')}
+                            >
+                              <BatteryChargingIcon className="size-4" />
+                              {Math.round(percent)}%
+                            </span>
+                          );
+                        })()}
+                        {!station.isOnline ? (
+                          <Badge variant="muted">{translate('Overview.offline')}</Badge>
+                        ) : chargerStatus ? (
+                          <Badge variant="outline" className={getStatusColor[chargerStatus]}>
+                            {chargerStatus}
+                          </Badge>
+                        ) : (
+                          <Badge variant="muted">{translate('Overview.unknown')}</Badge>
+                        )}
+                      </div>
                     </div>
 
                     {sessions.length === 0 ? (

@@ -1,4 +1,25 @@
 {
+  "CostCalculator": {
+    "menuLabel": "Calculadora de custos",
+    "title": "Calculadora de custos de carregamento",
+    "settings": "Configurações",
+    "pricePerKwh": "Preço por kWh",
+    "currency": "Moeda",
+    "from": "De",
+    "to": "Até",
+    "priceStoredNote": "O preço é salvo apenas neste navegador. Os custos são calculados a partir da energia entregue em cada sessão.",
+    "perCard": "Carregado por cartão RFID",
+    "total": "Total",
+    "rfidCard": "Cartão RFID",
+    "sessions": "Sessões",
+    "energy": "Energia",
+    "cost": "Custo",
+    "active": "ativa",
+    "noTag": "Sem tag RFID",
+    "noTransactions": "Nenhuma transação encontrada para este período.",
+    "loading": "Carregando...",
+    "errorLoading": "Erro ao carregar as transações."
+  },
   "Tariffs": {
     "Tariffs": "Tarifas",
     "tariff": "Tarifa",

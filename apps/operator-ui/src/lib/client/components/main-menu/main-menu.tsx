@@ -91,7 +91,7 @@ export const MainMenu = ({ activeSection }: MainMenuProps) => {
     },
     {
       key: `/${MenuSection.TARIFFS}`,
-      label: translate('Tariffs.Tariffs'),
+      label: translate('CostCalculator.menuLabel'),
       icon: <Receipt className={sidebarIconSize} />,
     },
     {

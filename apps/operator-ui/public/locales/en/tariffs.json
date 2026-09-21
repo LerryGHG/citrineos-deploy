@@ -1,4 +1,25 @@
 {
+  "CostCalculator": {
+    "menuLabel": "Cost Calculator",
+    "title": "Charging Cost Calculator",
+    "settings": "Settings",
+    "pricePerKwh": "Price per kWh",
+    "currency": "Currency",
+    "from": "From",
+    "to": "To",
+    "priceStoredNote": "The price is saved in this browser only. Costs are calculated from the energy each session delivered.",
+    "perCard": "Charged per RFID card",
+    "total": "Total",
+    "rfidCard": "RFID card",
+    "sessions": "Sessions",
+    "energy": "Energy",
+    "cost": "Cost",
+    "active": "active",
+    "noTag": "No RFID tag",
+    "noTransactions": "No transactions found for this period.",
+    "loading": "Loading...",
+    "errorLoading": "Error loading transactions."
+  },
   "Tariffs": {
     "Tariffs": "Tariffs",
     "tariff": "Tariff",

@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { TariffsList } from '@lib/client/pages/tariffs/list/tariffs-list';
+import { CostCalculator } from '@lib/client/pages/cost-calculator/cost-calculator';
 
-export default function ListTariffPage() {
-  return <TariffsList />;
+export default function CostCalculatorPage() {
+  return <CostCalculator />;
 }

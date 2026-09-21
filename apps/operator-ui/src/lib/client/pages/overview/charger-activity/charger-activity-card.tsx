@@ -189,6 +189,7 @@ export const ChargerActivityCard: React.FC = () => {
     query: { data, isLoading, error },
   } = useGqlCustom({
     gqlQuery: GET_CHARGING_STATIONS_WITH_LOCATION_AND_LATEST_STATUS_NOTIFICATIONS_AND_TRANSACTIONS,
+    queryOptions: { refetchInterval: 5000 },
   });
 
   const stations: ChargingStationDto[] = data?.data.ChargingStations || [];

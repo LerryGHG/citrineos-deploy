@@ -22,6 +22,8 @@
     "transactionStatus": "Status: {value}",
     "stations": "Estações",
     "liveMonitor": "Monitor ao vivo",
+    "activeSessionsCount": "{count} carregando",
+    "stationOffline": "Estação offline",
     "more": "mais",
     "noActiveSessions": "Nenhuma sessão de carregamento ativa.",
     "noStations": "Nenhuma estação encontrada.",

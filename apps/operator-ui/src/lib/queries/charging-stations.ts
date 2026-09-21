@@ -230,6 +230,10 @@ export const GET_CHARGING_STATIONS_OVERVIEW_GRID = gql`
       }
       transactions: Transactions(where: { isActive: { _eq: true } }) {
         ${ACTIVE_TRANSACTION_FIELDS}
+        startTime
+        authorization: Authorization {
+          idToken
+        }
         latestMeterValue: MeterValues(order_by: { timestamp: desc }, limit: 1) {
           sampledValue
           timestamp

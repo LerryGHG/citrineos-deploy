@@ -23,6 +23,7 @@
     "liveLogDisabledInactivity": "Live log disabled due to inactivity",
     "refreshMessages": "Refresh Messages",
     "noDataFound": "No charging station found with id {id}.",
+    "confirmDelete": "Delete station {name}? Its past transactions and meter values are kept for billing.",
     "unsupportedProtocol": "Unsupported protocol version: {protocol}",
     "fieldRequired": "{field} is required",
     "exportToCsvError": "Could export to CSV due to error: {error}",

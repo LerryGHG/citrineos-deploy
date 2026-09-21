@@ -110,6 +110,13 @@ export const ChargingStationDetailCard = ({
 
   const handleDeleteClick = useCallback(() => {
     if (!station) return;
+    if (
+      !window.confirm(
+        translate('ChargingStations.confirmDelete', { name: station.ocppConnectionName }),
+      )
+    ) {
+      return;
+    }
 
     mutate(
       {
@@ -125,7 +132,7 @@ export const ChargingStationDetailCard = ({
         },
       },
     );
-  }, [station, mutate, push]);
+  }, [station, mutate, push, translate]);
 
   const showForceDisconnectModal = useCallback(
     (station: ChargingStationDto) => {
@@ -240,15 +247,7 @@ export const ChargingStationDetailCard = ({
             action={ActionType.DELETE}
             params={{ id: station.id }}
           >
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteClick}
-              disabled={!!latestLog}
-              title={
-                latestLog ? 'Cannot delete a station that has OCPP message history' : undefined
-              }
-            >
+            <Button variant="destructive" size="sm" onClick={handleDeleteClick}>
               <Trash2 className={buttonIconSize} />
               {translate('buttons.delete')}
             </Button>

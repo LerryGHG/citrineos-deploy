@@ -23,6 +23,7 @@
     "liveLogDisabledInactivity": "Log ao vivo desativado por inatividade",
     "refreshMessages": "Atualizar Mensagens",
     "noDataFound": "Nenhuma estação de recarga encontrada com o id {id}.",
+    "confirmDelete": "Excluir a estação {name}? As transações e leituras anteriores são mantidas para faturamento.",
     "unsupportedProtocol": "Versão de protocolo não suportada: {protocol}",
     "fieldRequired": "{field} é obrigatório",
     "exportToCsvError": "Não foi possível exportar para CSV devido a um erro: {error}",

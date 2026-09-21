@@ -65,13 +65,18 @@ export const LiveMonitorCard: React.FC = () => {
       if (!prev || t > prev.t) latestByStation.set(station, { t, amps });
     }
 
-    return {
-      chartData: Array.from(byTime.entries())
-        .sort((a, b) => a[0] - b[0])
-        .map(([t, values]) => ({ t, ...values })),
-      stations: names.sort(),
-      latest: latestByStation,
-    };
+    // Stations report at their own moments, so any one timestamp only has a value for one
+    // of them. Carry each station's last reading forward so every point (and therefore the
+    // hover tooltip) has all stations.
+    const lastKnown: Record<string, number> = {};
+    const chartData = Array.from(byTime.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([t, values]) => {
+        Object.assign(lastKnown, values);
+        return { t, ...lastKnown };
+      });
+
+    return { chartData, stations: names.sort(), latest: latestByStation };
   }, [rows]);
 
   if (isLoading) return <OverviewCardSkeleton />;
@@ -129,7 +134,14 @@ export const LiveMonitorCard: React.FC = () => {
                     <Tooltip
                       labelFormatter={(t) => formatClock(Number(t), true)}
                       formatter={(value) => `${Number(value).toFixed(1)} A`}
-                      contentStyle={{ fontSize: 12 }}
+                      contentStyle={{
+                        fontSize: 12,
+                        backgroundColor: 'var(--popover)',
+                        color: 'var(--card-foreground)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 6,
+                      }}
+                      labelStyle={{ color: 'var(--muted-foreground)' }}
                     />
                     {stations.map((station, index) => (
                       <Line

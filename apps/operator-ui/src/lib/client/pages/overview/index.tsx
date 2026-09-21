@@ -17,11 +17,11 @@ export const Overview = () => {
         <ChargerActivityCard />
         <LiveMonitorCard />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-9 gap-4">
-        <div className="lg:col-span-5 w-full h-150">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="w-full h-150">
           <StationsGridCard />
         </div>
-        <div className="lg:col-span-4 w-full h-150">
+        <div className="w-full h-150">
           <ActiveTransactionsCard />
         </div>
       </div>

@@ -22,6 +22,7 @@
     "transactionStatus": "Status: {value}",
     "stations": "Stations",
     "liveMonitor": "Live Monitor",
+    "more": "more",
     "noActiveSessions": "No active charging sessions.",
     "noStations": "No stations found.",
     "currentDraw": "{value} A",

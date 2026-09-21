@@ -11,19 +11,41 @@ import { TRANSACTION_LIST_QUERY } from '@lib/queries/transactions';
 import { ActionType, ResourceType } from '@lib/utils/access-types';
 import { getPlainToInstanceOptions } from '@lib/utils/tables';
 import { CanAccess, useList, useTranslate } from '@refinedev/core';
-import { ChevronRightIcon } from 'lucide-react';
+import { ChevronRightIcon, ClockIcon, ZapIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Badge } from '@lib/client/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@lib/client/components/ui/card';
-import { clickableLinkStyle, heading2Style } from '@lib/client/styles/page';
+import { heading2Style } from '@lib/client/styles/page';
 import { overviewClickableStyle } from '@lib/client/styles/card';
 import { Skeleton } from '@lib/client/components/ui/skeleton';
 import { AccessDeniedFallbackCard } from '@lib/client/components/access-denied-fallback-card';
+import { useCardLabels } from '@lib/client/hooks/use-card-labels';
+
+const MAX_LISTED = 6;
+
+const formatElapsed = (startTime: string | Date | null | undefined, now: number): string | null => {
+  if (!startTime) return null;
+  const start = new Date(startTime).getTime();
+  if (Number.isNaN(start)) return null;
+  const totalMinutes = Math.max(0, Math.floor((now - start) / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+};
 
 export const ActiveTransactionsCard = () => {
   const { push } = useRouter();
   const translate = useTranslate();
+  const { describe } = useCardLabels();
   const [searchFilters, setSearchFilters] = useState<any[]>([]);
+
+  // Re-render every 30 s so the running time keeps counting.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const {
     query: { data, isLoading, isError },
@@ -33,7 +55,7 @@ export const ActiveTransactionsCard = () => {
       gqlQuery: TRANSACTION_LIST_QUERY,
       gqlVariables: {
         offset: 0,
-        limit: 3,
+        limit: MAX_LISTED,
         where: { isActive: { _eq: true } },
       },
     },
@@ -98,12 +120,13 @@ export const ActiveTransactionsCard = () => {
       action={ActionType.LIST}
       fallback={<AccessDeniedFallbackCard />}
     >
-      <Card className="h-full overflow-scroll">
+      <Card className="h-full flex flex-col">
         <CardHeader>
-          <div className="flex justify-between">
-            <h2 className={heading2Style}>
-              {translate('Overview.activeTransactions')} ({total})
-            </h2>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className={heading2Style}>{translate('Overview.activeTransactions')}</h2>
+              <Badge variant="secondary">{total}</Badge>
+            </div>
             <div
               className={overviewClickableStyle}
               onClick={() => push(`/${MenuSection.TRANSACTIONS}`)}
@@ -112,7 +135,7 @@ export const ActiveTransactionsCard = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto">
           {isError ? (
             <p>{translate('Overview.errorLoadingData')}</p>
           ) : (
@@ -129,41 +152,64 @@ export const ActiveTransactionsCard = () => {
                 />
               </div>
 
-              <div className="flex flex-col">
-                {transactions.length > 0 ? (
-                  transactions.map((transaction) => (
-                    <div className="flex flex-col mb-4" key={transaction.id}>
+              {transactions.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {transactions.map((transaction) => {
+                    const idToken = (transaction as any).authorization?.idToken as
+                      | string
+                      | undefined;
+                    const card = idToken ? describe(idToken) : null;
+                    const elapsed =
+                      formatElapsed((transaction as any).startTime, now) ??
+                      (transaction.timeSpentCharging
+                        ? String(transaction.timeSpentCharging)
+                        : null);
+
+                    return (
                       <div
-                        className={clickableLinkStyle}
+                        key={transaction.id}
+                        className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border p-3 transition-colors hover:border-primary"
                         onClick={() => push(`/${MenuSection.TRANSACTIONS}/${transaction.id}`)}
                       >
-                        <span className="link">{transaction.transactionId}</span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="size-2 shrink-0 animate-pulse rounded-full bg-success" />
+                            <span className="truncate font-semibold">
+                              {transaction.ocppConnectionName}
+                            </span>
+                          </div>
+                          <div className="truncate text-sm text-muted-foreground">
+                            #{transaction.transactionId}
+                            {card ? ` · ${card.title}` : ''}
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <div className="flex items-center justify-end gap-1 font-semibold">
+                            <ZapIcon className="size-4 text-warning" />
+                            {Number(transaction.totalKwh ?? 0).toFixed(2)} kWh
+                          </div>
+                          {elapsed && (
+                            <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
+                              <ClockIcon className="size-3" />
+                              {elapsed}
+                            </div>
+                          )}
+                        </div>
                       </div>
-
-                      <div>
-                        {translate('Overview.stationLabel', {
-                          value: transaction.ocppConnectionName,
-                        })}
-                      </div>
-                      <div>
-                        {translate('Overview.totalKwh', {
-                          value: transaction.totalKwh?.toFixed(2),
-                        })}
-                      </div>
-                      <div>
-                        {translate('Overview.totalTime', { value: transaction.timeSpentCharging })}
-                      </div>
-                      <div>
-                        {translate('Overview.transactionStatus', {
-                          value: transaction.chargingState,
-                        })}
-                      </div>
+                    );
+                  })}
+                  {total > transactions.length && (
+                    <div
+                      className="cursor-pointer pt-1 text-center text-sm text-muted-foreground hover:text-primary"
+                      onClick={() => push(`/${MenuSection.TRANSACTIONS}`)}
+                    >
+                      +{total - transactions.length} {translate('Overview.more')}
                     </div>
-                  ))
-                ) : (
-                  <span>{translate('Overview.noActiveTransactions')}</span>
-                )}
-              </div>
+                  )}
+                </div>
+              ) : (
+                <span>{translate('Overview.noActiveTransactions')}</span>
+              )}
             </div>
           )}
         </CardContent>

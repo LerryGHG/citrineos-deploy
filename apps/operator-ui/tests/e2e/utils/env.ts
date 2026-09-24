@@ -39,3 +39,14 @@ export function assertRequiredEnv(): void {
       `Copy .env.test.example to .env.test and fill in values.`,
   );
 }
+
+// Which login flow the SUT is actually running — the app's own
+// NEXT_PUBLIC_AUTH_PROVIDER, mirrored here so the harness knows whether
+// /login renders an inline form (generic) or immediately redirects to a
+// realm's hosted login page (keycloak). Not auto-detected: keeping it an
+// explicit env var matches how logout.spec.ts already gates its
+// Keycloak-only assertions, and avoids the suite silently testing the wrong
+// flow's UI just because a redirect happened to look similar.
+export function isKeycloakProvider(): boolean {
+  return readEnv('E2E_AUTH_PROVIDER', 'generic') === 'keycloak';
+}

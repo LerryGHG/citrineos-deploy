@@ -5,7 +5,7 @@
 import { test, expect } from '../../fixtures';
 import { LoginPage } from '../../pages/login-page';
 import { OverviewPage } from '../../pages/overview-page';
-import { readEnv } from '../../utils/env';
+import { readEnv, isKeycloakProvider } from '../../utils/env';
 
 // Login flow specs run without storage state — they ARE the login flow.
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -33,11 +33,24 @@ test.describe('auth › login', () => {
     ).toBe(true);
   });
 
-  test('E2E-002: login rejects invalid credentials and stays on /login', async ({ page }) => {
+  test('E2E-002: login rejects invalid credentials and stays on the login page', async ({
+    page,
+  }) => {
     const login = new LoginPage(page);
 
     await login.goto();
     await login.login(readEnv('E2E_ADMIN_EMAIL'), 'wrong-password-on-purpose');
+
+    if (isKeycloakProvider()) {
+      // Keycloak re-renders its own hosted page with an inline error — it
+      // never redirects back to the app on a rejected login. Confirmed
+      // against a live realm: a failed submit lands on
+      // /login-actions/authenticate, NOT the original /protocol/openid-connect/auth
+      // URL from goto() — this must match both, not just the first.
+      await expect(page).toHaveURL(/\/realms\/[^/]+\/(protocol\/openid-connect\/auth|login-actions\/)/);
+      await expect(login.keycloakErrorMessage).toBeVisible();
+      return;
+    }
 
     // The current UI does not surface an inline error alert with role="alert"
     // for invalid creds; it relies on staying on /login. We assert exactly
@@ -51,6 +64,17 @@ test.describe('auth › login', () => {
     const login = new LoginPage(page);
 
     await login.goto();
+
+    if (isKeycloakProvider()) {
+      await login.keycloakSubmitButton.click();
+      // Keycloak's hosted form has native `required` inputs — an empty
+      // submit never navigates away from the auth page. That's the one
+      // cross-version-stable signal; the exact validation UI (browser
+      // tooltip vs. Keycloak's own inline message) isn't asserted.
+      await expect(page).toHaveURL(/\/protocol\/openid-connect\/auth/);
+      return;
+    }
+
     await login.submitButton.click();
 
     await expect(page).toHaveURL(/\/login(\?.*)?$/);

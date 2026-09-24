@@ -13,6 +13,9 @@ It seeds:
   decide which role a logged-in user gets (see
   `apps/operator-ui/src/lib/providers/auth-provider/keycloak-auth-provider`).
 - Two users, `admin` and `user`, one per role.
+- A password policy (min. 8 characters, can't match the username or email)
+  and brute-force protection (5 failed attempts locks the account out with
+  escalating wait times, capped at 15 minutes).
 
 **The `REPLACE_WITH_GENERATED_*` values in the committed file are placeholders,
 not working credentials** — real secrets are never committed here (a git

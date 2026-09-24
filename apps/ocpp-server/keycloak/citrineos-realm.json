@@ -3,6 +3,12 @@
   "enabled": true,
   "sslRequired": "none",
   "registrationAllowed": false,
+  "passwordPolicy": "length(8) and notUsername and notEmail",
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "maxDeltaTimeSeconds": 43200,
   "clients": [
     {
       "clientId": "citrineos-ui",

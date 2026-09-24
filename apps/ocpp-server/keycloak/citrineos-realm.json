@@ -1,0 +1,56 @@
+{
+  "realm": "citrineos",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "clients": [
+    {
+      "clientId": "citrineos-ui",
+      "name": "CitrineOS Operator UI",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "REPLACE_WITH_GENERATED_CLIENT_SECRET",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "roles": {
+    "client": {
+      "citrineos-ui": [
+        { "name": "admin", "description": "Full access to the operator UI" },
+        { "name": "user", "description": "Restricted access to the operator UI" }
+      ]
+    }
+  },
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@citrineos.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "REPLACE_WITH_GENERATED_ADMIN_PASSWORD", "temporary": true }
+      ],
+      "clientRoles": { "citrineos-ui": ["admin"] }
+    },
+    {
+      "username": "user",
+      "email": "user@citrineos.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Standard",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "REPLACE_WITH_GENERATED_USER_PASSWORD", "temporary": true }
+      ],
+      "clientRoles": { "citrineos-ui": ["user"] }
+    }
+  ]
+}

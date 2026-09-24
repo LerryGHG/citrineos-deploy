@@ -78,3 +78,54 @@ services:
     # `docker compose -f docker-compose.yml -f docker-compose.local.yml build
     # citrine-ui` has been run (see docker-compose.local.yml).
     pull_policy: never
+
+  # Keycloak needs its own database. ocpp-db already runs Postgres for
+  # everything else, so this just adds a second database ("keycloak") on the
+  # same instance rather than standing up another Postgres container. The
+  # \gexec guard makes the CREATE DATABASE idempotent across repeated `up`s
+  # (plain CREATE DATABASE errors if it already exists).
+  keycloak-db-init:
+    image: postgis/postgis:16-3.5
+    entrypoint: ['sh', '-c']
+    command:
+      - >
+        psql -v ON_ERROR_STOP=1 -h ocpp-db -U citrine -d citrine -tAc
+        "SELECT 1 FROM pg_database WHERE datname='keycloak'" | grep -q 1 ||
+        psql -v ON_ERROR_STOP=1 -h ocpp-db -U citrine -d citrine -c
+        "CREATE DATABASE keycloak OWNER citrine"
+    environment:
+      PGPASSWORD: citrine
+    depends_on:
+      ocpp-db:
+        condition: service_healthy
+
+  # Identity provider backing the operator UI's admin/user login split (real
+  # Keycloak accounts instead of the single hardcoded "generic" admin login).
+  # KC_HOSTNAME is fixed rather than dynamically detected: Keycloak issues
+  # tokens with `iss` set to KC_HOSTNAME regardless of which URL a request
+  # actually came in on, which keeps the browser-facing login (via the
+  # published :8180 port) and the operator-ui container's internal
+  # server-to-server calls (via the `keycloak` service name) consistent. On
+  # every redeploy with a new server IP, update KC_HOSTNAME here the same way
+  # apps/operator-ui/.env.local's NEXT_PUBLIC_KEYCLOAK_URL gets updated (both
+  # currently say "localhost" and must be changed together).
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: ['start', '--http-enabled=true', '--import-realm']
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://ocpp-db:5432/keycloak
+      KC_DB_USERNAME: citrine
+      KC_DB_PASSWORD: citrine
+      KC_HOSTNAME: http://localhost:8180
+      KC_BOOTSTRAP_ADMIN_USERNAME: kcadmin
+      # Generate a real value at deploy time (e.g. `openssl rand -base64 24`) —
+      # this placeholder is intentionally not a working credential.
+      KC_BOOTSTRAP_ADMIN_PASSWORD: 'REPLACE_WITH_GENERATED_SECRET'
+    ports:
+      - '8180:8080'
+    volumes:
+      - ./apps/ocpp-server/keycloak:/opt/keycloak/data/import:ro
+    depends_on:
+      keycloak-db-init:
+        condition: service_completed_successfully

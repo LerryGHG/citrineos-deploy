@@ -2,7 +2,24 @@
 # container that also uses 3000 on this host.
 # `!override` fully replaces the base ports list instead of appending to it.
 services:
+  # Long-running services come back on their own after a reboot or a Docker
+  # restart. Without this only graphql-engine (which the base file marks
+  # `restart: always`) restarted, so everything else stayed down until someone
+  # ran `docker compose up` by hand. Docker's restart policy ignores
+  # depends_on, so at boot the services race each other; that's fine because
+  # one that starts before its database/broker just exits and is retried with
+  # backoff. The one-shot init containers (minio-init, db-init,
+  # hasura-metadata-init, keycloak-db-init) deliberately get NO policy:
+  # `unless-stopped` would re-run them forever once they finish. They only
+  # matter on the first `up` — what they set up persists in the databases.
+  # `unless-stopped` (not `always`) so a deliberate `docker compose stop`
+  # stays stopped across a Docker restart.
+  ocpp-db:
+    restart: unless-stopped
+  amqp-broker:
+    restart: unless-stopped
   minio:
+    restart: unless-stopped
     image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
   minio-init:
     image: quay.io/minio/mc:latest
@@ -76,7 +93,9 @@ services:
   # Build it once with `docker compose ... build citrine`.
   citrine:
     pull_policy: never
+    restart: unless-stopped
   citrine-ui:
+    restart: unless-stopped
     depends_on:
       hasura-metadata-init:
         condition: service_completed_successfully
@@ -119,6 +138,7 @@ services:
   # apps/operator-ui/.env.local's NEXT_PUBLIC_KEYCLOAK_URL gets updated (both
   # currently say "localhost" and must be changed together).
   keycloak:
+    restart: unless-stopped
     image: quay.io/keycloak/keycloak:latest
     command: ['start', '--http-enabled=true', '--import-realm']
     environment:

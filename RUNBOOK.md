@@ -33,6 +33,24 @@ Expect 8 containers running (`citrine`, `citrine-ui`, `graphql-engine`,
 containers (`db-init`, `hasura-metadata-init`, `keycloak-db-init`) that
 should show `Exited (0)` — that's success, not a crash.
 
+## After a reboot
+
+Every long-running service has `restart: unless-stopped` (see the top of
+`docker-compose.override.yml`), so the whole stack comes back on its own when
+the server or Docker restarts — no manual `up` needed. Give it a minute or
+two: Docker ignores `depends_on` at boot, so some services start too early,
+exit, and are retried with backoff until their database/broker is up.
+
+The one-shot init containers (`db-init`, `hasura-metadata-init`,
+`minio-init`, `keycloak-db-init`) intentionally have no restart policy and
+will show `Exited (0)` — that's normal, they only matter on the first `up`.
+
+**The one thing this can't fix: a changed IP.** If the server came back with
+a different address, the stack starts fine but the UI's baked-in URLs and
+Keycloak's `KC_HOSTNAME` point at the old one, so login breaks. Follow
+"When the server's IP changes" below. A DHCP reservation (or static IP) for
+the server removes this problem entirely.
+
 ## SSH access
 
 The deploy key is `~/.ssh/citrineos_deploy_new` on the operator's laptop.

@@ -37,7 +37,7 @@ export const PercentageCircle = ({ percentage, color }: { percentage: number; co
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl">{percentage}%</span>
+        <span className="text-base">{percentage}%</span>
       </div>
     </div>
   );

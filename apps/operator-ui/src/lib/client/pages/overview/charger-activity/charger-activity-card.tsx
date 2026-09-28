@@ -241,7 +241,11 @@ export const ChargerActivityCard: React.FC = () => {
           {error ? (
             <p>{translate('Overview.errorLoadingData')}</p>
           ) : (
-            <div className="flex gap-2">
+            // Fixed-width cells that wrap: the circle is `w-full` inside its cell, so
+            // without a set width its size follows the label text (uneven circles),
+            // and a non-wrapping row overflows into the neighbouring card whenever
+            // the card is narrower than seven cells side by side.
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-5">
               {[
                 ChargerStatusEnum.CHARGING,
                 ChargerStatusEnum.CHARGING_SUSPENDED,
@@ -253,16 +257,18 @@ export const ChargerActivityCard: React.FC = () => {
               ].map((status) => (
                 <div
                   key={status}
-                  className="flex flex-col items-center cursor-pointer"
+                  className="flex w-16 cursor-pointer flex-col items-center gap-1"
                   onClick={() => handleGaugeClick(status)}
                 >
-                  <PercentageCircle
-                    percentage={
-                      total > 0 ? Math.round((finalCounts[status].count / total) * 100) : 0
-                    }
-                    color={getStatusColor[status]}
-                  />
-                  <span>{status}</span>
+                  <div className="w-full">
+                    <PercentageCircle
+                      percentage={
+                        total > 0 ? Math.round((finalCounts[status].count / total) * 100) : 0
+                      }
+                      color={getStatusColor[status]}
+                    />
+                  </div>
+                  <span className="text-center text-[13px] leading-tight">{status}</span>
                 </div>
               ))}
             </div>

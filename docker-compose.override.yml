@@ -67,6 +67,15 @@ services:
         condition: service_healthy
       db-init:
         condition: service_completed_successfully
+  # Same trap as citrine-ui below, and a nastier one: the base file's
+  # `pull_policy: always` makes every plain `docker compose up -d` re-pull
+  # upstream's latest citrineos-server over the image built locally from this
+  # repo (docker-compose.local.yml). Upstream's image has a different layout
+  # (smaller, different working dir), so the CSMS then dies at startup with
+  # "Websocket servers config file not found" and the tag is silently gone.
+  # Build it once with `docker compose ... build citrine`.
+  citrine:
+    pull_policy: never
   citrine-ui:
     depends_on:
       hasura-metadata-init:

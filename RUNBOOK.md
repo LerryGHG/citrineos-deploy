@@ -105,6 +105,23 @@ Then, for the stuck ids:
 docker exec -i citrineos-ocpp-db-1 psql -U citrine -d citrine -c 'update "Transactions" set "isActive"=false where id in (<ids>) and "isActive"=true;'
 ```
 
+**The `citrine` container crash-loops with `Websocket servers config file not
+found: websocket-servers.json`** (path looks doubled:
+`.../apps/ocpp-server/apps/ocpp-server/src/assets/...`). Something re-pulled
+upstream's `ghcr.io/citrineos/citrineos-server:latest` over the image built
+locally from this repo. `citrine` is pinned to `pull_policy: never` in
+`docker-compose.override.yml` to prevent that, but the tag can still be
+wrong on a box where a plain `up` ran before the pin existed. Check with
+`docker image inspect ghcr.io/citrineos/citrineos-server:latest --format
+'{{.Size}} {{.Config.WorkingDir}}'` — the right image is ~2.3 GB with working
+dir `/usr/local/apps/citrineos`; the wrong (upstream) one is ~560 MB with
+`.../apps/ocpp-server`. Fix by rebuilding from source:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.override.yml --profile ui build citrine
+docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.override.yml --profile ui up -d
+```
+
 **A container got renamed to something like
 `73135591136d_citrineos-citrine-1`.** Leftover from a `docker compose up`
 that got interrupted partway through a recreate. Harmless but re-run

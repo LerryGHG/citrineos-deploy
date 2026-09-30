@@ -123,6 +123,30 @@ Then, for the stuck ids:
 docker exec -i citrineos-ocpp-db-1 psql -U citrine -d citrine -c 'update "Transactions" set "isActive"=false where id in (<ids>) and "isActive"=true;'
 ```
 
+**MinIO won't pull — Docker Hub says `minio/minio`/`minio/mc` don't exist,
+or quay.io returns 401 on `quay.io/minio/*`.** MinIO's own free image
+distribution changed upstream, not anything wrong with this deploy — the
+override now pins both to `bitnamilegacy/minio:latest` /
+`bitnamilegacy/minio-client:latest` (Bitnami's frozen-free mirror), which
+still pulled anonymously as of this writing. If that also 401s/404s one day,
+this needs a new source again — check `docker pull` against it directly
+before assuming it's this deploy's fault. That image runs as a non-root uid
+baked in, so a fresh `minio-permissions-init` one-shot container chowns the
+bind-mounted data directory before `minio` starts; it's already wired up,
+no manual step needed.
+
+**A freshly cloned box already has a `data/` directory with something broken
+in it** (seen once: a 0-byte, unwritable RabbitMQ `.erlang.cookie`, which
+crashes it with `"Too short cookie string"` and blocks every service that
+depends on it, including `citrine`). This means the VM was provisioned from
+a snapshot/template that already had partial Docker state on it, not a
+truly blank machine — the CSMS image being pre-cached on a "fresh" clone is
+the same symptom. If anything in `docker ps -a` is crash-looping right after
+a fresh deploy, check `ls apps/ocpp-server/data` before assuming the compose
+config is wrong — a stop + `rm -rf apps/ocpp-server/data` + `up` (same reset
+used for the wrong-image migration issue above) starts everything genuinely
+clean and has resolved this every time so far.
+
 **The `citrine` container crash-loops with `Websocket servers config file not
 found: websocket-servers.json`** (path looks doubled:
 `.../apps/ocpp-server/apps/ocpp-server/src/assets/...`). Something re-pulled

@@ -18,11 +18,34 @@ services:
     restart: unless-stopped
   amqp-broker:
     restart: unless-stopped
+  # Both minio/minio and minio/mc on Docker Hub are gone entirely ("repository
+  # does not exist"), and quay.io/minio/* — where an earlier fix had already
+  # pinned these — now issues anonymous pull tokens with zero grants (401).
+  # MinIO's own free image distribution, not anything wrong with this deploy.
+  # bitnamilegacy/* (Bitnami's frozen-free mirror after their own registry
+  # went paid-catalog-only) still pulls anonymously as of this writing — if
+  # that stops working too, self-hosting a copy is the durable fix.
+  #
+  # The image runs as a baked-in non-root uid (1001), which a bind-mounted
+  # host directory Docker creates fresh is owned root and unwritable by —
+  # minio-permissions-init fixes that before minio starts. Its own
+  # entrypoint.sh (github.com/bitnami/containers) execs `minio server ...`
+  # directly when the first arg is "server" (this repo's inherited base
+  # command), so no other base-file field needs changing for either service.
+  minio-permissions-init:
+    image: bitnamilegacy/minio:latest
+    entrypoint: ['sh', '-c', 'mkdir -p /data && chown -R 1001:1001 /data']
+    user: '0'
+    volumes:
+      - ./apps/ocpp-server/data/minio:/data
   minio:
     restart: unless-stopped
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    image: bitnamilegacy/minio:latest
+    depends_on:
+      minio-permissions-init:
+        condition: service_completed_successfully
   minio-init:
-    image: quay.io/minio/mc:latest
+    image: bitnamilegacy/minio-client:latest
   graphql-engine:
     # The cli-migrations variant's entrypoint spins up a temporary internal
     # server on :9691 and polls it over localhost to apply migrations before

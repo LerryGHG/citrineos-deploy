@@ -1,0 +1,79 @@
+{
+  "Locations": {
+    "Locations": "Standorte",
+    "location": "Standort",
+    "noDataFound": "Kein Standort mit der ID {id} gefunden.",
+    "unnamedLocation": "Unbenannter Standort",
+    "noAddress": "Keine Adresse",
+    "chargingStations": "Ladestationen",
+    "openingHours": "Öffnungszeiten",
+    "viewStations": "Stationen anzeigen",
+    "columns": {
+      "name": "Name",
+      "address": "Adresse",
+      "latitude": "Breitengrad",
+      "longitude": "Längengrad",
+      "timeZone": "Zeitzone",
+      "parkingType": "Parkplatzart",
+      "facilities": "Einrichtungen",
+      "totalStations": "Stationen gesamt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am"
+    },
+    "detail": {
+      "totalChargers": "Ladepunkte gesamt",
+      "imageAlt": "{name}-Bild"
+    },
+    "form": {
+      "name": "Name",
+      "streetAddress": "Straße und Hausnummer",
+      "streetAddressRequired": "Straße und Hausnummer sind erforderlich",
+      "addressAutocompletePlaceholder": "Zum Suchen tippen oder unten manuell eingeben",
+      "city": "Stadt",
+      "cityPlaceholder": "z. B. Berlin",
+      "stateProvinceRegion": "Bundesland / Provinz / Region",
+      "stateProvinceRegionPlaceholder": "z. B. Bayern, Ontario, California",
+      "postalCode": "Postleitzahl",
+      "postalCodePlaceholder": "z. B. 10115, SW1A 1AA, 94105",
+      "country": "Land",
+      "selectCountry": "Land auswählen",
+      "searchCountries": "Länder durchsuchen …",
+      "latitude": "Breitengrad",
+      "longitude": "Längengrad",
+      "autoFilledFromAddress": "Automatisch aus Adresse übernommen",
+      "timeZone": "Zeitzone",
+      "parkingType": "Parkplatzart",
+      "selectParkingType": "Parkplatzart auswählen",
+      "searchParkingTypes": "Parkplatzarten durchsuchen",
+      "facilities": "Einrichtungen",
+      "selectFacilities": "Einrichtungen auswählen",
+      "searchFacilities": "Einrichtungen durchsuchen",
+      "image": "Bild",
+      "upload": "Hochladen",
+      "uploadFailedToast": "Ladestationen am Standort konnten aufgrund eines Fehlers nicht aktualisiert werden: {error}"
+    },
+    "stations": {
+      "searchChargingStation": "Ladestation suchen",
+      "noChargingStationsFound": "Keine Ladestationen gefunden",
+      "noChargingStationsSelected": "Keine Ladestationen ausgewählt",
+      "stationId": "Stations-ID",
+      "configuration": "Konfiguration",
+      "needsConfiguration": "Konfiguration erforderlich",
+      "modelVendor": "Modell / Hersteller",
+      "needsModel": "Modell erforderlich",
+      "needsVendor": "Hersteller erforderlich"
+    },
+    "map": {
+      "viewDetails": "Details anzeigen",
+      "networkOverview": "Netzwerkübersicht",
+      "all": "Alle",
+      "locations": "Standorte",
+      "stations": "Stationen",
+      "viewTypeDetails": "{type}-Details anzeigen",
+      "online": "Online",
+      "partial": "Teilweise",
+      "offline": "Offline",
+      "noChargers": "Keine Ladepunkte."
+    }
+  }
+}

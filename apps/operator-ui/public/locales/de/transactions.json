@@ -1,0 +1,77 @@
+{
+  "Transactions": {
+    "Transactions": "Transaktionen",
+    "transaction": "Transaktion",
+    "toggleActiveStatus": "Aktiv-Status umschalten",
+    "toggleActiveWarning": "Sie sind dabei, diese Transaktion als folgenden Status zu markieren: ",
+    "toggleActiveCaution": "Achtung: Diese Aktion kann dazu führen, dass die Oberfläche nicht mehr mit dem tatsächlichen Transaktionsstatus übereinstimmt. Fahren Sie nur fort, wenn Sie sich sicher sind.",
+    "noDataFound": "Keine Transaktion mit der ID {id} gefunden.",
+    "exportToCsvError": "CSV-Export der Transaktionen fehlgeschlagen: {error}",
+    "columns": {
+      "transactionId": "Transaktions-ID",
+      "active": "Aktiv",
+      "stationId": "Stations-ID",
+      "location": "Standort",
+      "idToken": "ID-Token",
+      "totalKwh": "Gesamt kWh",
+      "status": "Status",
+      "startTime": "Startzeit",
+      "endTime": "Endzeit",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am"
+    },
+    "detail": {
+      "stationId": "Stations-ID",
+      "location": "Standort",
+      "totalKwh": "Gesamt kWh",
+      "chargingState": "Ladestatus",
+      "startTime": "Startzeit",
+      "endTime": "Endzeit",
+      "tariff": "Tarif"
+    },
+    "tabs": {
+      "meterValueData": "Zählerwerte",
+      "events": "Ereignisse",
+      "ocppMessages": "OCPP-Nachrichten",
+      "contexts": "Kontexte:",
+      "selectReadingContexts": "Messkontexte auswählen",
+      "searchReadingContexts": "Messkontexte durchsuchen"
+    },
+    "charts": {
+      "timeElapsed": "Verstrichene Zeit",
+      "stateOfChargeLabel": "Ladezustand (%)",
+      "stateOfChargeTitle": "Ladezustand im Zeitverlauf",
+      "noStateOfChargeData": "Keine Ladezustandsdaten verfügbar",
+      "energyLabel": "Energie (kWh)",
+      "energyTitle": "Energie im Zeitverlauf",
+      "noEnergyData": "Keine Energiedaten verfügbar",
+      "voltageLabel": "Spannung (V)",
+      "voltageTitle": "Spannung im Zeitverlauf",
+      "noVoltageData": "Keine Spannungsdaten verfügbar",
+      "powerLabel": "Leistung (kW)",
+      "powerTitle": "Leistung im Zeitverlauf",
+      "noPowerData": "Keine Leistungsdaten verfügbar",
+      "currentLabel": "Strom (A)",
+      "currentTitle": "Strom im Zeitverlauf",
+      "noCurrentData": "Keine Stromdaten verfügbar"
+    },
+    "events": {
+      "eventType": "Ereignistyp",
+      "timestamp": "Zeitstempel",
+      "seqNo": "Lfd. Nr.",
+      "triggerReason": "Auslösegrund",
+      "viewMeterValues": "Zählerwerte anzeigen"
+    },
+    "meterValues": {
+      "id": "ID",
+      "timestamp": "Zeitstempel",
+      "sampleValues": "Messwerte",
+      "value": "Wert",
+      "context": "Kontext",
+      "measurand": "Messgröße",
+      "phase": "Phase",
+      "location": "Ort",
+      "sampledValue": "Messwert {index}"
+    }
+  }
+}

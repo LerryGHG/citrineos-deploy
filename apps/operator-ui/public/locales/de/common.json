@@ -1,0 +1,315 @@
+{
+  "Common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "create": "Erstellen",
+    "edit": "Bearbeiten",
+    "clear": "Leeren",
+    "search": "Suchen",
+    "searchOptions": "Suchoptionen",
+    "searchColumns": "Spalten durchsuchen",
+    "export": "Exportieren",
+    "refresh": "Aktualisieren",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "ok": "OK",
+    "submit": "Absenden",
+    "apply": "Anwenden",
+    "reset": "Zurücksetzen",
+    "loading": "Wird geladen",
+    "loadingEllipsis": "Wird geladen …",
+    "yes": "Ja",
+    "no": "Nein",
+    "actions": "Aktionen",
+    "status": "Status",
+    "online": "Online",
+    "offline": "Offline",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "unknown": "Unbekannt",
+    "time": "Zeit",
+    "copiedToClipboard": "In die Zwischenablage kopiert.",
+    "copiedValueToClipboard": "„{value}“ in die Zwischenablage kopiert.",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "noResults": "Keine Ergebnisse gefunden",
+    "noDataFound": "Keine Daten gefunden",
+    "nothingFound": "Nichts gefunden.",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "select": "Auswählen",
+    "selectItem": "Element auswählen",
+    "selectOption": "Option auswählen",
+    "selectOptions": "Optionen auswählen …",
+    "selected": "ausgewählt",
+    "openMenu": "Menü öffnen",
+    "filters": "Filter",
+    "activeFilters": "Aktive Filter",
+    "addFilter": "Filter hinzufügen",
+    "addFilterButton": "Filter hinzufügen",
+    "clearAll": "Alle zurücksetzen",
+    "searchField": "{field} durchsuchen …",
+    "atMost": "höchstens {value}",
+    "after": "nach {value}",
+    "rowsSelected": "{selected} von {total} Zeile(n) ausgewählt.",
+    "pageOf": "Seite {page} von {total}",
+    "pickDateRange": "Zeitraum auswählen",
+    "startTypingAddress": "Adresse eingeben …",
+    "useValue": "„{value}“ verwenden",
+    "removeFilter": "Filter entfernen: {field}"
+  },
+  "filters": {
+    "valueOrLess": "{unit} oder weniger",
+    "previewText": "„{label}“ enthält „{value}“",
+    "previewNumber": "„{label}“ ist höchstens {value}",
+    "previewDate": "„{label}“ innerhalb von {preset}",
+    "previewEnum": "„{label}“ ist {value}",
+    "previewYes": "„{label}“ ist Ja",
+    "previewNo": "„{label}“ ist Nein"
+  },
+  "filterPresets": {
+    "today": "Heute",
+    "last7Days": "Letzte 7 Tage",
+    "last30Days": "Letzte 30 Tage",
+    "last3Months": "Letzte 3 Monate",
+    "thisYear": "Dieses Jahr"
+  },
+  "openingHours": {
+    "title": "Öffnungszeiten",
+    "twentyFourSeven": "24/7 geöffnet",
+    "twentyFourSevenDescription": "Dieser Standort ist 24 Stunden am Tag, 7 Tage die Woche geöffnet",
+    "regularHours": "Reguläre Öffnungszeiten",
+    "noRegularHours": "Keine regulären Öffnungszeiten angegeben",
+    "exceptionalOpenings": "Sonderöffnungen",
+    "exceptionalClosings": "Sonderschließungen",
+    "specialOpening": "Sonderöffnung",
+    "closed": "Geschlossen",
+    "form": {
+      "addHours": "Öffnungszeiten hinzufügen",
+      "addOpening": "Öffnung hinzufügen",
+      "addClosing": "Schließung hinzufügen",
+      "selectDay": "Tag auswählen",
+      "exceptionalOpeningsDescription": "Besondere Termine, an denen der Standort geöffnet ist",
+      "exceptionalClosingsDescription": "Besondere Termine, an denen der Standort geschlossen ist",
+      "removeTimeSlot": "Zeitfenster entfernen?",
+      "removeTimeSlotConfirm": "Möchten Sie dieses Zeitfenster wirklich entfernen?",
+      "removeOpening": "Sonderöffnung entfernen?",
+      "removeOpeningConfirm": "Möchten Sie diese Sonderöffnung wirklich entfernen?",
+      "removeClosing": "Sonderschließung entfernen?",
+      "removeClosingConfirm": "Möchten Sie diese Sonderschließung wirklich entfernen?"
+    },
+    "weekdays": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    }
+  },
+  "pages": {
+    "login": {
+      "title": "Bei Ihrem Konto anmelden",
+      "description": "Geben Sie Ihre Zugangsdaten ein, um auf das Dashboard zuzugreifen",
+      "signin": "Anmelden",
+      "signingIn": "Anmeldung läuft …",
+      "signup": "Registrieren",
+      "divider": "oder",
+      "invalidCredentials": "Ungültige E-Mail-Adresse oder ungültiges Passwort",
+      "fields": {
+        "email": "E-Mail",
+        "password": "Passwort"
+      },
+      "placeholders": {
+        "email": "admin@example.com",
+        "password": "Passwort eingeben"
+      },
+      "errors": {
+        "validEmail": "Ungültige E-Mail-Adresse",
+        "requiredEmail": "E-Mail-Adresse ist erforderlich",
+        "requiredPassword": "Passwort ist erforderlich"
+      },
+      "buttons": {
+        "submit": "Anmelden",
+        "forgotPassword": "Passwort vergessen?",
+        "noAccount": "Sie haben noch kein Konto?",
+        "rememberMe": "Angemeldet bleiben"
+      }
+    },
+    "forgotPassword": {
+      "title": "Passwort vergessen?",
+      "fields": {
+        "email": "E-Mail"
+      },
+      "errors": {
+        "validEmail": "Ungültige E-Mail-Adresse",
+        "requiredEmail": "E-Mail-Adresse ist erforderlich"
+      },
+      "buttons": {
+        "submit": "Anweisungen zum Zurücksetzen senden"
+      }
+    },
+    "register": {
+      "title": "Konto registrieren",
+      "fields": {
+        "email": "E-Mail",
+        "password": "Passwort"
+      },
+      "errors": {
+        "validEmail": "Ungültige E-Mail-Adresse",
+        "requiredEmail": "E-Mail-Adresse ist erforderlich",
+        "requiredPassword": "Passwort ist erforderlich"
+      },
+      "buttons": {
+        "submit": "Registrieren",
+        "haveAccount": "Sie haben bereits ein Konto?"
+      }
+    },
+    "updatePassword": {
+      "title": "Passwort aktualisieren",
+      "fields": {
+        "password": "Neues Passwort",
+        "confirmPassword": "Neues Passwort bestätigen"
+      },
+      "errors": {
+        "confirmPasswordNotMatch": "Die Passwörter stimmen nicht überein",
+        "requiredPassword": "Passwort erforderlich",
+        "requiredConfirmPassword": "Bestätigung des Passworts ist erforderlich"
+      },
+      "buttons": {
+        "submit": "Aktualisieren"
+      }
+    },
+    "error": {
+      "info": "Möglicherweise haben Sie vergessen, die Komponente {action} zur Ressource {resource} hinzuzufügen.",
+      "title": "Seite nicht gefunden.",
+      "description": "Die gesuchte Seite existiert nicht.",
+      "404": "Die von Ihnen aufgerufene Seite existiert leider nicht.",
+      "resource404": "Stellen Sie sicher, dass Sie die Ressource {resource} erstellt haben.",
+      "backHome": "Zurück zur Startseite"
+    },
+    "redirectingToLogin": "Weiterleitung zur Anmeldung …",
+    "checkingAuth": "Authentifizierung wird überprüft …",
+    "redirectingToKeycloak": "Weiterleitung zu Keycloak …",
+    "redirectingToKeycloakLogin": "Weiterleitung zur Keycloak-Anmeldung …"
+  },
+  "actions": {
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "list": "Liste",
+    "show": "Anzeigen"
+  },
+  "buttons": {
+    "add": "Hinzufügen",
+    "cancel": "Abbrechen",
+    "clear": "Leeren",
+    "clone": "Duplizieren",
+    "columns": "Spalten",
+    "confirm": "Sind Sie sicher?",
+    "confirmText": "Bestätigen",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "download": "Herunterladen",
+    "edit": "Bearbeiten",
+    "exportToCsv": "Als CSV exportieren",
+    "filter": "Filter",
+    "import": "Importieren",
+    "logout": "Abmelden",
+    "notAccessTitle": "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen.",
+    "ok": "OK",
+    "refresh": "Aktualisieren",
+    "save": "Speichern",
+    "saving": "Wird gespeichert …",
+    "show": "Anzeigen",
+    "submit": "Absenden",
+    "undo": "Rückgängig machen",
+    "upload": "Hochladen"
+  },
+  "warnWhenUnsavedChanges": "Möchten Sie die Seite wirklich verlassen? Sie haben ungespeicherte Änderungen.",
+  "notifications": {
+    "success": "Erfolgreich",
+    "error": "Fehler (Statuscode: {statusCode})",
+    "undoable": "Sie haben {seconds} Sekunden Zeit, um dies rückgängig zu machen",
+    "createSuccess": "{resource} erfolgreich erstellt",
+    "createError": "Beim Erstellen von {resource} ist ein Fehler aufgetreten (Statuscode: {statusCode})",
+    "deleteSuccess": "{resource} erfolgreich gelöscht",
+    "deleteError": "Fehler beim Löschen von {resource} (Statuscode: {statusCode})",
+    "editSuccess": "{resource} erfolgreich bearbeitet",
+    "editError": "Fehler beim Bearbeiten von {resource} (Statuscode: {statusCode})",
+    "importProgress": "Import läuft: {processed}/{total}"
+  },
+  "notificationProvider": {
+    "notAllowed": "Nicht erlaubt",
+    "missingRequiredParameter": "Fehlender erforderlicher Parameter: {parameter}",
+    "noPermission": "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen.",
+    "contactAdministrator": "Bitte wenden Sie sich an Ihren Administrator, wenn Sie glauben, dass dies ein Fehler ist."
+  },
+  "messages": {
+    "requestSuccessful": "Die Anfrage war erfolgreich {payload}",
+    "requestFailed": "Anfrage fehlgeschlagen",
+    "noSuccessfulResponse": "Die Anfrage hat keine erfolgreiche Antwort erhalten.",
+    "requestFailedWithMessage": "Die Anfrage ist mit folgender Meldung fehlgeschlagen: {message}"
+  },
+  "auth": {
+    "loginFailed": "Anmeldung fehlgeschlagen"
+  },
+  "confirmDialog": {
+    "title": "Sind Sie sicher?",
+    "description": "Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "accessDenied": "Zugriff verweigert",
+  "imageUploadFailed": "Bild-Upload fehlgeschlagen.",
+  "loading": "Wird geladen",
+  "noDataFound": "Keine Daten gefunden",
+  "somethingWentWrong": "Es ist ein Fehler aufgetreten.",
+  "loggedOut": "Abgemeldet! Weiterleitung zur Anmeldung …",
+  "tags": {
+    "clone": "Duplizieren"
+  },
+  "table": {
+    "actions": "Aktionen",
+    "bulkActions": "Massenaktionen",
+    "clearFilters": "Filter zurücksetzen",
+    "noResultsFound": "Keine Ergebnisse gefunden",
+    "selectAll": "Alle auswählen",
+    "selected": "ausgewählt",
+    "toggleColumns": "Spalten ein-/ausblenden",
+    "resetColumns": "Spalten zurücksetzen"
+  },
+  "dialogs": {
+    "areYouSure": "Sind Sie sicher?",
+    "thisActionCannotBeUndone": "Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "placeholders": {
+    "search": "Suchen",
+    "select": "Auswählen"
+  },
+  "pagination": {
+    "buttons": {
+      "goToFirstPage": "Zur ersten Seite",
+      "goToNextPage": "Zur nächsten Seite",
+      "goToPreviousPage": "Zur vorherigen Seite",
+      "goToLastPage": "Zur letzten Seite"
+    },
+    "rowsPerPage": "Zeilen pro Seite"
+  },
+  "menu": {
+    "overview": "Übersicht",
+    "help": "Hilfe",
+    "language": "Sprache",
+    "expandSidebar": "Seitenleiste erweitern",
+    "collapseSidebar": "Seitenleiste einklappen",
+    "themes": {
+      "changeTo": "Wechseln zu",
+      "dark": "Dunkel",
+      "light": "Hell",
+      "mode": "Modus"
+    }
+  }
+}

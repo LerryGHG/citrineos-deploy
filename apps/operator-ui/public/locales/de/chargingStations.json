@@ -1,0 +1,493 @@
+{
+  "ChargingStations": {
+    "ChargingStations": "Ladestationen",
+    "chargingStation": "Ladestation",
+    "use16StatusNotification0": "OCPP-1.6-Statusmeldungen mit Connector-ID 0 verwenden",
+    "toggleOnlineStatus": "Online-Status umschalten",
+    "toggleOnlineWarning": "Sie sind dabei, diese Ladestation als folgenden Status zu markieren: ",
+    "toggleOnlineCaution": "Achtung: Diese Aktion kann dazu führen, dass die Oberfläche nicht mehr mit dem tatsächlichen Stationsstatus übereinstimmt. Fahren Sie nur fort, wenn Sie sich sicher sind.",
+    "commandsUnavailable": "Station offline – Befehle nicht verfügbar",
+    "forceDisconnect": "Verbindung erzwungen trennen",
+    "otherCommands": "Weitere Befehle",
+    "remoteStart": "Remote-Start",
+    "remoteStop": "Remote-Stopp",
+    "reset": "Zurücksetzen",
+    "startTransaction": "Transaktion starten",
+    "stopTransaction": "Transaktion stoppen",
+    "forceDisconnectMessage": "Möchten Sie die Verbindung zu dieser Ladestation wirklich erzwungen trennen",
+    "forceDisconnectCaution": "Dadurch wird die Verbindung zur Station sofort beendet.",
+    "exportMessagesToCsvHeader": "OCPP-Nachrichten als CSV exportieren",
+    "downloadAllMessagesToCsv": "Sie laden alle OCPP-Nachrichten für diese Ladestation herunter.",
+    "downloadMessagesToCsvWithFilters": "Sie laden die OCPP-Nachrichten für diese Ladestation mit den folgenden Filtern herunter:",
+    "liveLog": "Live-Protokoll",
+    "liveLogDisabledInactivity": "Live-Protokoll wegen Inaktivität deaktiviert",
+    "refreshMessages": "Nachrichten aktualisieren",
+    "noDataFound": "Keine Ladestation mit der ID {id} gefunden.",
+    "confirmDelete": "Station {name} löschen? Vergangene Transaktionen und Zählerwerte bleiben für die Abrechnung erhalten.",
+    "unsupportedProtocol": "Nicht unterstützte Protokollversion: {protocol}",
+    "fieldRequired": "{field} ist erforderlich",
+    "exportToCsvError": "CSV-Export aufgrund eines Fehlers fehlgeschlagen: {error}",
+    "detailCard": {
+      "lastOcppMessage": "Letzte OCPP-Nachricht",
+      "connectorTypes": "Connector-Typen",
+      "totalEvses": "EVSEs gesamt"
+    },
+    "tabs": {
+      "evses": "EVSEs",
+      "ocppMessages": "OCPP-Nachrichten",
+      "configuration": "Konfiguration",
+      "networkProfiles": "Netzwerkprofile",
+      "aggregatedMeterValuesData": "Aggregierte Zählerwerte",
+      "noEvsesPermission": "Sie haben keine Berechtigung, EVSEs anzuzeigen.",
+      "noOcppLogsPermission": "Sie haben keine Berechtigung, OCPP-Protokolle anzuzeigen.",
+      "noConfigurationsPermission": "Sie haben keine Berechtigung, Stationskonfigurationen anzuzeigen."
+    },
+    "networkProfiles": {
+      "empty": "Für diese Station wurden noch keine Netzwerkprofile konfiguriert.",
+      "slot": "Slot",
+      "ocppVersion": "OCPP-Version",
+      "csmsUrl": "CSMS-URL",
+      "securityProfile": "Sicherheitsprofil",
+      "serverId": "Server-ID",
+      "delete": "Netzwerkprofile löschen"
+    },
+    "columns": {
+      "name": "Name",
+      "stationId": "Stations-ID",
+      "location": "Standort",
+      "onlineStatus": "Online-Status",
+      "protocol": "Protokoll",
+      "securityProfile": "Sicherheitsprofil",
+      "serverId": "Server-ID",
+      "vendorModel": "Hersteller / Modell",
+      "vendor": "Hersteller",
+      "floorLevel": "Etage",
+      "parkingRestrictions": "Parkbeschränkungen",
+      "capabilities": "Funktionen",
+      "firmwareVersion": "Firmware-Version",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am"
+    },
+    "aggregatedData": {
+      "timeRange": "Zeitraum:",
+      "contexts": "Kontexte:",
+      "selectReadingContexts": "Messkontexte auswählen"
+    },
+    "connectors": {
+      "connectorId": "Connector-ID",
+      "connectorIdDescription": "Die bei 1 beginnenden fortlaufenden Zahlen, die in OCPP 1.6 zur Bezeichnung des Connectors verwendet werden, eindeutig je Ladestation.",
+      "evseTypeConnectorId": "EVSE-Typ-Connector-ID",
+      "evseTypeConnectorIdDescription": "Die bei 1 beginnenden fortlaufenden Zahlen, die in OCPP 2.0.1 zur Bezeichnung des Connectors verwendet werden, eindeutig je EVSE.",
+      "type": "Typ",
+      "format": "Format",
+      "powerType": "Stromart",
+      "maxPower": "Maximale Leistung",
+      "maximumAmperage": "Maximale Stromstärke",
+      "maximumVoltage": "Maximale Spannung",
+      "maximumPowerWatts": "Maximale Leistung (Watt)",
+      "termsAndConditionsUrl": "URL der Nutzungsbedingungen",
+      "tariff": "Tarif",
+      "selectType": "Typ auswählen",
+      "searchTypes": "Typen durchsuchen",
+      "selectFormat": "Format auswählen",
+      "selectPowerType": "Stromart auswählen",
+      "searchPowerTypes": "Stromarten durchsuchen",
+      "selectTariff": "Tarif auswählen",
+      "searchTariffs": "Tarife durchsuchen",
+      "noConnectors": "Keine Connectoren",
+      "addConnector": "Connector hinzufügen",
+      "addNewConnector": "Neuen Connector hinzufügen",
+      "editConnector": "Connector bearbeiten"
+    },
+    "evses": {
+      "evseTypeId": "EVSE-Typ-ID",
+      "evseTypeIdDescription": "Die in OCPP 2.0.1 zur Bezeichnung des EVSE verwendeten fortlaufenden Zahlen, eindeutig je Ladestation.",
+      "evseId": "EVSE-ID",
+      "evseIdDescription": "Die eMI3-konforme EVSE-ID, die weltweit eindeutig sein muss.",
+      "physicalReference": "Physische Kennzeichnung",
+      "physicalReferenceDescription": "Eine auf dem EVSE aufgedruckte Kennzeichnung zur physischen Identifizierung vor Ort, z. B. eine Zahl oder ein Buchstabe.",
+      "removed": "Entfernt",
+      "removedDescription": "Als ENTFERNT markiert",
+      "noEvses": "Keine EVSEs",
+      "viewConnectors": "Connectoren anzeigen",
+      "addNewEvse": "Neues EVSE hinzufügen",
+      "editEvse": "EVSE bearbeiten"
+    },
+    "evseSelector": {
+      "label": "EVSE",
+      "loading": "EVSEs werden geladen …",
+      "searchPlaceholder": "EVSE suchen",
+      "description": "EVSE-IDs sind bei 1 beginnende fortlaufende Zahlen"
+    },
+    "connectorSelector": {
+      "label": "Connector",
+      "loading": "Connectoren werden geladen …",
+      "searchPlaceholder": "Connectoren suchen",
+      "selectConnector": "Connector auswählen",
+      "selectEvse": "EVSE auswählen",
+      "description": "Connector-IDs sind bei 1 beginnende fortlaufende Zahlen",
+      "descriptionForEvse": "Connectoren für das ausgewählte EVSE"
+    },
+    "requestId": {
+      "label": "Anfrage-ID",
+      "placeholder": "Anfrage-ID eingeben",
+      "positiveError": "Die Anfrage-ID muss eine positive Zahl sein"
+    },
+    "firmwareDiagnostics": {
+      "locationUrl": "Speicherort (URL)",
+      "invalidUrl": "Muss eine gültige URL sein",
+      "locationRequired": "Speicherort ist erforderlich",
+      "retries": "Wiederholungen",
+      "retriesPlaceholder": "Anzahl der Wiederholungen",
+      "retryInterval": "Wiederholungsintervall",
+      "retryIntervalPlaceholder": "Wiederholungsintervall in Sekunden"
+    },
+    "commands": {
+      "certificateSigned": "Zertifikat signiert",
+      "changeAvailability": "Verfügbarkeit ändern",
+      "changeConfiguration": "Konfiguration ändern",
+      "clearCache": "Cache leeren",
+      "customerInformation": "Kundeninformationen",
+      "dataTransfer": "Datenübertragung",
+      "deleteCertificate": "Zertifikat löschen",
+      "deleteStationNetworkProfiles": "Stations-Netzwerkprofile löschen",
+      "getBaseReport": "Basisbericht abrufen",
+      "getConfiguration": "Konfiguration abrufen",
+      "getDiagnostics": "Diagnose abrufen",
+      "getInstalledCertificateIds": "Installierte Zertifikats-IDs abrufen",
+      "getLogs": "Protokolle abrufen",
+      "getTransactionStatus": "Transaktionsstatus abrufen",
+      "getVariables": "Variablen abrufen",
+      "installCertificate": "Zertifikat installieren",
+      "setNetworkProfile": "Netzwerkprofil festlegen",
+      "setVariables": "Variablen festlegen",
+      "triggerMessage": "Nachricht auslösen",
+      "unlockConnector": "Connector entriegeln",
+      "updateAuthPassword": "Authentifizierungspasswort aktualisieren",
+      "updateFirmware": "Firmware aktualisieren"
+    },
+    "resetModal": {
+      "resetType": "Zurücksetzungsart",
+      "selectResetType": "Zurücksetzungsart auswählen",
+      "selectResetTypeError": "Bitte wählen Sie eine Zurücksetzungsart aus"
+    },
+    "remoteStartModal": {
+      "start": "Starten",
+      "remoteStartId": "Remote-Start-ID",
+      "remoteStartIdMin": "Die Remote-Start-ID muss mindestens 0 sein",
+      "idToken": "ID-Token",
+      "idTokenRequired": "ID-Token ist erforderlich",
+      "searchIdToken": "ID-Token suchen",
+      "authorization": "Autorisierung",
+      "authorizationRequired": "Autorisierung ist erforderlich",
+      "selectAuthorization": "Autorisierung auswählen",
+      "searchAuthorizations": "Autorisierungen durchsuchen"
+    },
+    "remoteStopModal": {
+      "stop": "Stoppen",
+      "transactionRequired": "Transaktion ist erforderlich",
+      "noActiveTransactions": "Für diese Ladestation wurden keine aktiven Transaktionen gefunden.",
+      "activeTransactions": "Aktive Transaktionen",
+      "selectTransaction": "Transaktion auswählen",
+      "searchTransactions": "Transaktionen durchsuchen",
+      "unknownEvse": "Unbekannt"
+    },
+    "dataTransferModal": {
+      "vendorId": "Hersteller-ID",
+      "vendorIdRequired": "Hersteller-ID ist erforderlich",
+      "vendorIdPlaceholder": "Herstellerspezifische Implementierungskennung",
+      "messageId": "Nachrichten-ID",
+      "messageIdPlaceholder": "Spezifische Nachrichten- oder Implementierungskennung",
+      "data": "Daten",
+      "dataPlaceholder": "Zu sendende Daten (Freitext)"
+    },
+    "changeAvailabilityModal": {
+      "availability": "Verfügbarkeit",
+      "selectAvailabilityError": "Bitte wählen Sie eine Verfügbarkeitsart aus",
+      "connectorRequired": "Connector ist erforderlich",
+      "operationalStatus": "Betriebsstatus",
+      "selectStatus": "Status auswählen",
+      "selectStatusError": "Bitte wählen Sie einen Betriebsstatus aus"
+    },
+    "changeConfigurationModal": {
+      "key": "Schlüssel",
+      "keyRequired": "Schlüssel ist erforderlich",
+      "keyPlaceholder": "Konfigurationsschlüssel",
+      "value": "Wert",
+      "valueRequired": "Wert ist erforderlich",
+      "valuePlaceholder": "Konfigurationswert"
+    },
+    "getConfigurationModal": {
+      "description": "Optional können Sie Konfigurationsschlüssel angeben, die abgerufen werden sollen. Leer lassen, um alle Konfigurationswerte abzurufen.",
+      "key": "Schlüssel",
+      "keyNumber": "Schlüssel Nr. {number}",
+      "keyPlaceholder": "Konfigurationsschlüssel eingeben"
+    },
+    "getDiagnosticsModal": {
+      "startTimestamp": "Startzeitpunkt",
+      "stopTimestamp": "Endzeitpunkt"
+    },
+    "triggerMessageModal": {
+      "requestedMessage": "Angeforderte Nachricht",
+      "selectMessage": "Nachricht auswählen",
+      "selectMessageError": "Bitte wählen Sie einen Nachrichtentyp aus",
+      "selectMessageType": "Nachrichtentyp auswählen",
+      "searchMessageTypes": "Nachrichtentypen durchsuchen"
+    },
+    "updateFirmwareModal": {
+      "retrieveDate": "Abrufdatum",
+      "retrieveDateRequired": "Abrufdatum ist erforderlich",
+      "retrieveDateTime": "Abrufdatum/-zeit",
+      "installDateTime": "Installationsdatum/-zeit",
+      "signingCertificate": "Signaturzertifikat (PEM)",
+      "signingCertificatePlaceholder": "PEM-formatiertes Zertifikat hier einfügen",
+      "signature": "Signatur",
+      "signaturePlaceholder": "Firmware-Signatur"
+    },
+    "certificateSignedModal": {
+      "certificateFile": "Zertifikatsdatei",
+      "certificateRequired": "Zertifikatsdatei ist erforderlich",
+      "fileTypeError": "Die Datei muss einen der folgenden Typen haben: {types}",
+      "fileSizeError": "Die Dateigröße darf 5 MB nicht überschreiten",
+      "certificateType": "Zertifikatstyp",
+      "selectCertificateType": "Zertifikatstyp auswählen"
+    },
+    "clearCacheModal": {
+      "description": "Dadurch wird eine Clear-Cache-Anfrage an die Ladestation gesendet. Die Station leert ihren Autorisierungs-Cache.",
+      "proceed": "Möchten Sie fortfahren?",
+      "clearing": "Wird geleert …"
+    },
+    "customerInformationModal": {
+      "report": "Bericht",
+      "clear": "Leeren",
+      "customerIdentifier": "Kundenkennung",
+      "customerIdentifierPlaceholder": "Kundenkennung eingeben"
+    },
+    "deleteCertificateModal": {
+      "certificateRequired": "Zertifikat ist erforderlich",
+      "selectCertificateError": "Bitte wählen Sie ein Zertifikat aus",
+      "wrongStationError": "Dieses Zertifikat gehört nicht zu dieser Station",
+      "hashAlgorithm": "Hash-Algorithmus:",
+      "installedCertificate": "Installiertes Zertifikat",
+      "searchCertificates": "Zertifikate nach Seriennummer durchsuchen"
+    },
+    "deleteStationNetworkProfilesModal": {
+      "slotsRequired": "Mindestens ein Konfigurations-Slot ist erforderlich",
+      "deleteProfiles": "Profile löschen",
+      "slot": "Slot",
+      "slotNumber": "Slot Nr. {number}",
+      "slotPlaceholder": "Slot-Nummer eingeben"
+    },
+    "getBaseReportModal": {
+      "reportBase": "Berichtsbasis",
+      "reportBaseRequired": "Berichtsbasis ist erforderlich",
+      "selectReportBase": "Berichtsbasis auswählen"
+    },
+    "getInstalledCertificateIdsModal": {
+      "certificateTypes": "Zertifikatstypen",
+      "description": "Wenn keine Zertifikatstypen angegeben werden, werden alle Zertifikatstypen angefordert.",
+      "selectCertificateTypes": "Zertifikatstypen auswählen",
+      "searchCertificateTypes": "Zertifikatstypen durchsuchen"
+    },
+    "getLogsModal": {
+      "remoteLocationUrl": "Remote-Speicherort (URL)",
+      "remoteLocationRequired": "Remote-Speicherort ist erforderlich",
+      "logType": "Protokolltyp",
+      "logTypeRequired": "Protokolltyp ist erforderlich",
+      "selectLogType": "Protokolltyp auswählen",
+      "oldestTimestamp": "Ältester Zeitstempel",
+      "latestTimestamp": "Neuester Zeitstempel"
+    },
+    "getTransactionStatusModal": {
+      "transaction": "Transaktion",
+      "description": "Optional können Sie eine Transaktion auswählen, um deren Status abzurufen. Leer lassen, um den Status aller Transaktionen abzurufen."
+    },
+    "getVariablesModal": {
+      "alert": "Senden Sie einen GetBaseReport an diese Ladestation, um Komponenten und Variablen zu erfassen.",
+      "atLeastOneVariable": "Mindestens eine Variable ist erforderlich",
+      "componentAndVariableRequired": "Komponente und Variable sind für jeden Eintrag erforderlich",
+      "component": "Komponente",
+      "variable": "Variable",
+      "componentNumber": "Komponente Nr. {number}",
+      "variableNumber": "Variable Nr. {number}",
+      "componentInstanceNumber": "Komponenteninstanz Nr. {number}",
+      "variableInstanceNumber": "Variableninstanz Nr. {number}",
+      "attributeTypeNumber": "Attributtyp Nr. {number}",
+      "instance": "Instanz",
+      "selectComponent": "Komponente auswählen",
+      "searchComponents": "Komponenten durchsuchen",
+      "selectVariable": "Variable auswählen",
+      "searchVariables": "Variablen durchsuchen",
+      "selectAttributeType": "Attributtyp auswählen"
+    },
+    "setVariablesModal": {
+      "valueRequired": "Wert ist erforderlich",
+      "allFieldsRequired": "Komponente, Variable und Wert sind für jeden Eintrag erforderlich",
+      "valueNumber": "Wert Nr. {number}",
+      "valuePlaceholder": "Zu setzender Wert"
+    },
+    "installCertificateModal": {
+      "certificateRequired": "Zertifikat ist erforderlich",
+      "certificateTooLong": "Das Zertifikat darf höchstens 5500 Zeichen lang sein",
+      "certificateTypeRequired": "Zertifikatstyp ist erforderlich",
+      "invalidPem": "Fehlerhaft formatiertes PEM-Zertifikat",
+      "certificatePem": "Zertifikat (PEM)"
+    },
+    "setNetworkProfileModal": {
+      "apnRequired": "APN ist erforderlich",
+      "apnAuthRequired": "APN-Authentifizierung ist erforderlich",
+      "serverRequired": "Server ist erforderlich",
+      "userRequired": "Benutzer ist erforderlich",
+      "passwordRequired": "Passwort ist erforderlich",
+      "keyRequired": "Schlüssel ist erforderlich",
+      "vpnTypeRequired": "VPN-Typ ist erforderlich",
+      "ocppVersionRequired": "OCPP-Version ist erforderlich",
+      "ocppTransportRequired": "OCPP-Transport ist erforderlich",
+      "csmsUrlRequired": "CSMS-URL ist erforderlich",
+      "messageTimeoutPositive": "Das Nachrichten-Timeout muss positiv sein",
+      "securityProfilePositive": "Das Sicherheitsprofil muss positiv sein",
+      "ocppInterfaceRequired": "OCPP-Schnittstelle ist erforderlich",
+      "configurationSlotNonNegative": "Der Konfigurations-Slot darf nicht negativ sein",
+      "websocketServerConfig": "Websocket-Server-Konfiguration",
+      "searchServerProfiles": "Server-Netzwerkprofile durchsuchen",
+      "configurationSlot": "Konfigurations-Slot",
+      "ocppVersion": "OCPP-Version",
+      "selectOcppVersion": "OCPP-Version auswählen",
+      "ocppTransport": "OCPP-Transport",
+      "selectOcppTransport": "OCPP-Transport auswählen",
+      "ocppCsmsUrl": "OCPP-CSMS-URL",
+      "messageTimeout": "Nachrichten-Timeout (Sekunden)",
+      "securityProfile": "Sicherheitsprofil",
+      "ocppInterface": "OCPP-Schnittstelle",
+      "selectOcppInterface": "OCPP-Schnittstelle auswählen",
+      "includeApn": "APN-Konfiguration einbeziehen",
+      "includeVpn": "VPN-Konfiguration einbeziehen",
+      "apn": "APN",
+      "apnPlaceholder": "APN-Name",
+      "apnAuthentication": "APN-Authentifizierung",
+      "selectAuthType": "Authentifizierungstyp auswählen",
+      "apnUsername": "APN-Benutzername",
+      "apnPassword": "APN-Passwort",
+      "simPin": "SIM-PIN",
+      "preferredNetwork": "Bevorzugtes Netzwerk",
+      "useOnlyPreferredNetwork": "Nur bevorzugtes Netzwerk verwenden",
+      "vpnType": "VPN-Typ",
+      "selectVpnType": "VPN-Typ auswählen",
+      "server": "Server",
+      "serverPlaceholder": "VPN-Server",
+      "user": "Benutzer",
+      "userPlaceholder": "VPN-Benutzername",
+      "group": "Gruppe",
+      "password": "Passwort",
+      "passwordPlaceholder": "VPN-Passwort",
+      "key": "Schlüssel",
+      "keyPlaceholder": "VPN-Schlüssel"
+    },
+    "updateAuthPasswordModal": {
+      "passwordRequired": "Passwort ist erforderlich",
+      "updatePassword": "Passwort aktualisieren",
+      "password": "Passwort",
+      "passwordPlaceholder": "Neues Passwort eingeben",
+      "setOnCharger": "Auf Ladestation setzen"
+    },
+    "upsert": {
+      "selectLocation": "Standort auswählen",
+      "selectParkingRestrictions": "Parkbeschränkungen auswählen",
+      "searchParkingRestrictions": "Parkbeschränkungen durchsuchen",
+      "selectCapabilities": "Funktionen auswählen",
+      "searchCapabilities": "Funktionen durchsuchen",
+      "useLocationCoordinates": "Standortkoordinaten verwenden",
+      "latitude": "Breitengrad",
+      "enterLatitude": "Breitengrad eingeben",
+      "longitude": "Längengrad",
+      "enterLongitude": "Längengrad eingeben",
+      "image": "Bild"
+    },
+    "ocppMessages": {
+      "searchCorrelationId": "Korrelations-ID suchen",
+      "selectActions": "Aktionen auswählen",
+      "searchActions": "Aktionen durchsuchen",
+      "filterOrigins": "Ursprünge filtern",
+      "allOrigins": "Alle Ursprünge",
+      "pickStartDate": "Startdatum auswählen",
+      "pickEndDate": "Enddatum auswählen",
+      "correlationId": "Korrelations-ID",
+      "actionOrigin": "Aktion – Ursprung",
+      "unknownAction": "Unbekannte Aktion",
+      "type": "Typ",
+      "unknownType": "Unbekannter Typ",
+      "timestamp": "Zeitstempel",
+      "content": "Inhalt",
+      "findRelatedMessage": "Zugehörige Nachricht finden",
+      "copyCorrelationId": "Korrelations-ID kopieren"
+    },
+    "configuration": {
+      "key": "Schlüssel",
+      "value": "Wert",
+      "type": "Typ",
+      "componentNameInstance": "Komponentenname:Instanz",
+      "variableNameInstance": "Variablenname:Instanz",
+      "evseConnectorId": "EVSE-ID:Connector-ID",
+      "stationId": "Stations-ID",
+      "action": "Aktion",
+      "noData": "Keine Daten",
+      "noDataForDownload": "Keine Daten zum Herunterladen verfügbar",
+      "loadAttributesError": "Variablenattribute konnten nicht geladen werden",
+      "loadConfigurationsError": "Konfigurationsänderungen konnten nicht geladen werden",
+      "selectOcppVersion": "OCPP-Version auswählen",
+      "downloadCsv": "CSV herunterladen",
+      "searchPlaceholder": "Suchen …",
+      "addConfiguration": "Konfiguration hinzufügen",
+      "editConfiguration": "Konfiguration bearbeiten",
+      "filterByType": "Nach Typ filtern",
+      "searchTypes": "Typen durchsuchen",
+      "mutability": "Änderbarkeit"
+    },
+    "connectionModal": {
+      "welcomeTitle": "Willkommen bei der CitrineOS Operator UI",
+      "connectionTitle": "Verbindung der Ladestation",
+      "welcomeDescription": "Sehen Sie sich dieses kurze Einführungsvideo an, um zu erfahren, wie Sie Ladestationen verbinden. Sie können diese Informationen jederzeit über die Schaltfläche „Hilfe“ aufrufen.",
+      "connectionDescription": "Verwenden Sie die folgenden mandantenspezifischen Websocket-URLs, um sich mit dem Server zu verbinden. Die Verbindung kann schrittweise von „Keine Authentifizierung“ bis Sicherheitsprofil 3 hochgestuft werden.",
+      "showConnectionInfo": "Verbindungsinformationen anzeigen",
+      "showHelpVideo": "Hilfevideo anzeigen",
+      "gettingStartedVideo": "Einführungsvideo",
+      "videoNotSupported": "Ihr Browser unterstützt das Video-Tag nicht.",
+      "noVideoAvailable": "Kein Video verfügbar",
+      "videoDescription": "Dieses Video zeigt, wie Ladestationen mit der CitrineOS-Plattform verbunden werden.",
+      "quickSteps": "Schnelleinstieg",
+      "step1": "Konfigurieren Sie Ihre Ladestation mit der passenden Websocket-URL",
+      "step2": "Wählen Sie das zu Ihrer Konfiguration passende Sicherheitsprofil",
+      "step3": "Kopieren Sie die Verbindungs-URL aus dem Bereich Verbindungsinformationen",
+      "step4": "Testen Sie die Verbindung von Ihrer Ladestation aus",
+      "rememberLabel": "Denken Sie daran:",
+      "rememberText": "Sie können diese Hilfeinhalte jederzeit über die Schaltfläche „Hilfe“ in der Seitenleiste aufrufen.",
+      "copied": "Kopiert!",
+      "noWebsocketServers": "Keine Websocket-Server verfügbar.",
+      "securityProfiles": {
+        "0": {
+          "label": "Keine Authentifizierung",
+          "description": "Die Ladestation verbindet sich ohne Zugangsdaten. Richten Sie Benutzername/Passwort über diese Verbindung ein"
+        },
+        "1": {
+          "label": "Sicherheitsprofil 1: Ungesicherter Transport mit Basisauthentifizierung",
+          "description": "Die Authentifizierung der Ladestation erfolgt über Benutzername und Passwort. Installieren Sie das CA-Zertifikat auf der Ladestation über diese Verbindung"
+        },
+        "2": {
+          "label": "Sicherheitsprofil 2: TLS mit Basisauthentifizierung",
+          "description": "Das CSMS authentifiziert sich mit einem TLS-Serverzertifikat. Die Ladestationen authentifizieren sich mittels HTTP-Basisauthentifizierung. Signieren Sie das Ladestationszertifikat über diese Verbindung"
+        },
+        "3": {
+          "label": "Sicherheitsprofil 3: TLS mit clientseitigen Zertifikaten",
+          "description": "Sowohl Ladestation als auch CSMS authentifizieren sich mittels Zertifikaten."
+        }
+      }
+    },
+    "exportDialog": {
+      "correlationId": "Korrelations-ID",
+      "actions": "Aktionen",
+      "origin": "Ursprung",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum"
+    }
+  }
+}

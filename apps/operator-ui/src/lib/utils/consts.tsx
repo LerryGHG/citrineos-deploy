@@ -10,6 +10,7 @@ export const DEFAULT_LOCALE = 'en';
 
 export const LOCALES = [
   { value: 'en', label: 'English' },
+  { value: 'de', label: 'Deutsch' },
   { value: 'pt-BR', label: 'Português (Brasil)' },
 ];
 

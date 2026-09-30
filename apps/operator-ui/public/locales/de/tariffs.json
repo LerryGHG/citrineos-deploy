@@ -1,0 +1,92 @@
+{
+  "CostCalculator": {
+    "menuLabel": "Kostenrechner",
+    "title": "Ladekosten-Rechner",
+    "settings": "Einstellungen",
+    "pricePerKwh": "Preis pro kWh",
+    "currency": "Währung",
+    "from": "Von",
+    "to": "Bis",
+    "priceStoredNote": "Der Preis wird nur in diesem Browser gespeichert. Die Kosten werden aus der pro Sitzung gelieferten Energie berechnet.",
+    "perCard": "Aufgeladen nach RFID-Karte",
+    "total": "Gesamt",
+    "rfidCard": "RFID-Karte",
+    "sessions": "Sitzungen",
+    "energy": "Energie",
+    "cost": "Kosten",
+    "active": "aktiv",
+    "noTag": "Kein RFID-Tag",
+    "noTransactions": "Für diesen Zeitraum wurden keine Transaktionen gefunden.",
+    "loading": "Wird geladen …",
+    "errorLoading": "Fehler beim Laden der Transaktionen.",
+    "tabCalculator": "Rechner",
+    "tabBilling": "Abrechnung / Berichte",
+    "month": "Monat",
+    "allCards": "Alle Karten",
+    "exportCsv": "CSV exportieren",
+    "print": "Drucken / PDF",
+    "statementTitle": "Ladeabrechnung",
+    "subtotal": "Zwischensumme",
+    "station": "Station",
+    "transaction": "Transaktion",
+    "start": "Start",
+    "end": "Ende",
+    "driver": "Fahrer",
+    "car": "Fahrzeug",
+    "popupBlocked": "Bitte erlauben Sie Pop-ups für diese Seite, um die Abrechnung zu drucken."
+  },
+  "Cars": {
+    "menuLabel": "Fahrzeuge / Fahrer",
+    "title": "Fahrzeuge / Fahrer",
+    "description": "Weisen Sie jeder RFID-Karte einen Fahrer- und Fahrzeugnamen zu. Diese Namen erscheinen im Rechner, in der Abrechnung und in Berichten anstelle der reinen Kartennummer.",
+    "search": "Karten, Fahrer, Fahrzeuge suchen …",
+    "rfidCard": "RFID-Karte",
+    "status": "Status",
+    "driver": "Fahrer",
+    "car": "Fahrzeug",
+    "notes": "Notizen",
+    "driverPlaceholder": "z. B. Anna",
+    "carPlaceholder": "z. B. Tesla Model 3",
+    "save": "Speichern",
+    "saving": "Wird gespeichert …",
+    "saveError": "Speichern nicht möglich.",
+    "errorLoading": "Fehler beim Laden der Karten.",
+    "loading": "Wird geladen …",
+    "noCards": "Keine RFID-Karten gefunden."
+  },
+  "Tariffs": {
+    "Tariffs": "Tarife",
+    "tariff": "Tarif",
+    "noDataFound": "Kein Tarif mit der ID {id} gefunden.",
+    "columns": {
+      "id": "ID",
+      "currency": "Währung",
+      "pricePerKwh": "Preis / kWh",
+      "pricePerMin": "Preis / Min.",
+      "pricePerSession": "Preis / Sitzung"
+    },
+    "fields": {
+      "currency": "Währung (3-stelliger Code)",
+      "pricePerKwh": "Preis pro kWh",
+      "pricePerMin": "Preis pro Minute",
+      "pricePerSession": "Preis pro Sitzung",
+      "authorizationAmount": "Autorisierungsbetrag",
+      "paymentFee": "Zahlungsgebühr",
+      "taxRate": "Steuersatz (%)",
+      "tariffAltText": "Alternativtext des Tarifs (JSON)"
+    },
+    "placeholders": {
+      "currency": "z. B. EUR",
+      "tariffAltText": "{ \"en\": \"Standard tariff\", \"de\": \"Standardtarif\" }"
+    },
+    "detail": {
+      "currency": "Währung",
+      "pricePerKwh": "Preis / kWh",
+      "pricePerMin": "Preis / Min.",
+      "pricePerSession": "Preis / Sitzung",
+      "authorizationAmount": "Autorisierungsbetrag",
+      "paymentFee": "Zahlungsgebühr",
+      "taxRate": "Steuersatz (%)"
+    }
+  }
+}

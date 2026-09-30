@@ -1,0 +1,67 @@
+{
+  "TenantPartners": {
+    "TenantPartners": "Partner",
+    "tenantPartner": "Partner",
+    "noDataFound": "Kein Partner mit der ID {id} gefunden.",
+    "unnamedBusiness": "Unbenanntes Unternehmen",
+    "loadingPartnerData": "Partnerdaten werden geladen …",
+    "columns": {
+      "name": "Name",
+      "countryCode": "Ländercode",
+      "partyId": "Party-ID"
+    },
+    "fields": {
+      "countryCode": "Ländercode",
+      "partyId": "Party-ID",
+      "versionsUrl": "Versions-URL",
+      "clientToken": "Client-Token",
+      "ocpiVersion": "OCPI-Version",
+      "versionDetailsUrl": "URL der Versionsdetails",
+      "serverCredentialsVersionsUrl": "Versions-URL (Server-Zugangsdaten)",
+      "serverCredentialsToken": "Token (Server-Zugangsdaten)",
+      "roles": "Rollen",
+      "role": "Rolle",
+      "businessName": "Firmenname",
+      "website": "Website"
+    },
+    "placeholders": {
+      "selectVersion": "Version auswählen",
+      "selectRole": "Rolle auswählen",
+      "businessName": "Firmenname",
+      "website": "Website"
+    },
+    "validation": {
+      "countryCodeLength": "Der Ländercode muss genau 2 Zeichen lang sein.",
+      "partyIdLength": "Die Party-ID muss genau 3 Zeichen lang sein."
+    },
+    "notifications": {
+      "createSuccess": "Partner erfolgreich erstellt",
+      "updateSuccess": "Partner erfolgreich aktualisiert",
+      "createError": "Fehler beim Erstellen des Partners: {message}",
+      "updateError": "Fehler beim Aktualisieren des Partners: {message}"
+    },
+    "detail": {
+      "countryCode": "Ländercode",
+      "partyId": "Party-ID",
+      "website": "Website",
+      "roles": "Rollen",
+      "ocpiVersion": "OCPI-Version",
+      "versionsUrl": "Versions-URL",
+      "logoAlt": "{name}-Logo"
+    },
+    "tabs": {
+      "endpoints": "Endpunkte"
+    },
+    "endpoints": {
+      "endpoint": "Endpunkt",
+      "identifier": "Kennung",
+      "url": "URL",
+      "noEndpointsFound": "Keine Endpunkte gefunden",
+      "deleteConfirm": "Möchten Sie diesen Endpunkt wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "errorIdentifierRequired": "Bitte geben Sie eine Kennung ein",
+      "errorUrlRequired": "Bitte geben Sie eine URL ein",
+      "placeholderIdentifier": "Kennung eingeben",
+      "placeholderUrl": "URL eingeben"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "Authorizations": {
+    "Authorizations": "Autorisierungen",
+    "authorization": "Autorisierung",
+    "noDataFound": "Keine Autorisierung mit der ID {id} gefunden.",
+    "noId": "Keine ID",
+    "allowed": "Erlaubt",
+    "notAllowed": "Nicht erlaubt",
+    "columns": {
+      "authorizationId": "Autorisierungs-ID",
+      "type": "Typ",
+      "status": "Status",
+      "concurrentTransactions": "Gleichzeitige Transaktionen",
+      "allowedTypes": "Erlaubte Typen",
+      "disallowedPrefixes": "Nicht erlaubte Präfixe",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am"
+    },
+    "fields": {
+      "idToken": "ID-Token",
+      "idTokenType": "ID-Token-Typ",
+      "status": "Status",
+      "cacheExpiryDateTime": "Cache-Ablaufzeitpunkt",
+      "chargingPriority": "Ladepriorität",
+      "language1": "Sprache 1",
+      "language2": "Sprache 2",
+      "personalMessage": "Persönliche Nachricht",
+      "groupAuthorizationId": "Gruppenautorisierungs-ID",
+      "allowedConnectorTypes": "Erlaubte Connector-Typen (kommagetrennt)",
+      "disallowedEvseIdPrefixes": "Nicht erlaubte EVSE-ID-Präfixe (kommagetrennt)",
+      "realTimeAuth": "Echtzeit-Authentifizierung",
+      "realTimeAuthUrl": "URL der Echtzeit-Authentifizierung",
+      "realTimeAuthTimeout": "Timeout der Echtzeit-Authentifizierung (Sekunden)",
+      "concurrentTransaction": "Gleichzeitige Transaktion zulassen",
+      "additionalInfo": "Zusätzliche Informationen",
+      "additionalIdToken": "Zusätzliches ID-Token Nr. {index}",
+      "type": "Typ",
+      "typeNumbered": "Typ Nr. {index}"
+    },
+    "placeholders": {
+      "selectType": "Typ auswählen",
+      "searchTypes": "Typen durchsuchen",
+      "selectStatus": "Status auswählen",
+      "searchStatuses": "Status durchsuchen",
+      "allowedConnectorTypes": "z. B. Type2, CCS",
+      "disallowedEvseIdPrefixes": "z. B. EVSE1, EVSE2",
+      "selectOption": "Option auswählen",
+      "searchOption": "Option durchsuchen",
+      "additionalInfo": "Zusätzliche Informationen",
+      "type": "Typ"
+    },
+    "detail": {
+      "partner": "Partner",
+      "realTimeAuthTimeoutSeconds": "{timeout} Sekunden"
+    },
+    "attempts": {
+      "registeredTab": "Registrierte Karten",
+      "attemptsTab": "Versuchsprotokoll",
+      "description": "Jede von einer Ladestation empfangene Authorize-Anfrage und die Antwort des CSMS, über alle Stationen hinweg.",
+      "station": "Ladestation",
+      "request": "Anfrage",
+      "response": "Antwort",
+      "idTagOrResult": "ID-Tag / Ergebnis",
+      "searchIdTag": "ID-Tag suchen"
+    }
+  }
+}

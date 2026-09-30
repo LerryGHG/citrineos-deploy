@@ -200,6 +200,54 @@ Keycloak admin console → realm dropdown → **citrineos** (not `master`) →
 - Full setup notes and what the `admin`/`user` roles actually mean to the
   app: `apps/ocpp-server/keycloak/README.md`.
 
+## Never do this to the server's copies of the 3 live-secret files
+
+`docker-compose.override.yml`, `apps/operator-ui/.env.local`, and
+`apps/ocpp-server/keycloak/citrineos-realm.json` hold real, generated
+secrets on the server that don't exist anywhere else (not in git, not
+recoverable except by reading them back out of Keycloak/the running
+containers — see below). Two mistakes have now silently wiped them back to
+their tracked `REPLACE_WITH_GENERATED_*`/`localhost` placeholders, both
+looking harmless at the time:
+
+1. **`scp`-ing a locally-edited copy of one of these files to the server.**
+   The local tracked copy is *always* placeholder-only — copying it across
+   overwrites the server's real values with placeholders. If a local edit
+   needs to reach the server, `scp` it to a temp path and re-apply just the
+   diff, or re-run the substitution step below afterward — don't overwrite
+   the live file outright.
+2. **`git checkout -- <file>` on any of these three**, e.g. to clean the
+   working tree before a `git pull`. This resets the file to what's
+   committed (placeholders), which is exactly what you don't want. Use
+   `git stash` (not `checkout`) before a `pull`, then `git stash pop` after
+   — this preserves the live values instead of discarding them.
+
+Damage from either mistake can be silent for a while: already-running
+containers keep the old (correct) values baked in from when they were
+created, so nothing looks wrong until something rebuilds or recreates a
+container — at which point login breaks with `Failed to fetch` /
+`invalid_client`-type errors that don't obviously point back to this cause.
+After either mistake, or if you're ever unsure, re-run the substitution
+step earlier in this doc (regenerating fresh secrets is fine and safe
+except for one thing — the Keycloak client secret must match in two
+places). If you need the *existing* client secret rather than a fresh one
+(e.g. only `.env.local` got reset, and re-generating would desync it from
+what's already imported into Keycloak), recover it instead of guessing:
+
+```bash
+# realm's client secret, given a working kcadmin login
+TOKEN=$(curl -s -d 'client_id=admin-cli&grant_type=password&username=kcadmin&password=<kcadmin password>' \
+  http://localhost:8180/realms/master/protocol/openid-connect/token | jq -r .access_token)
+CLIENT_UUID=$(curl -s -H "Authorization: Bearer $TOKEN" \
+  'http://localhost:8180/admin/realms/citrineos/clients?clientId=citrineos-ui' | jq -r '.[0].id')
+curl -s -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8180/admin/realms/citrineos/clients/$CLIENT_UUID/client-secret" | jq -r .value
+```
+
+`NEXTAUTH_SECRET` has no equivalent recovery — it's never persisted
+anywhere but the file. If it's lost, just generate a new one; the only
+effect is that existing browser sessions get signed out.
+
 ## Secrets
 
 Nothing above needs a secret value written into git, and none should be —

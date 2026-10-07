@@ -54,6 +54,10 @@ dist
 # Written by scripts/set-server-ip.sh on the server after a successful run
 /.deployed-ip
 
+# The server's IP and every password/secret (scripts/init-env.sh). Lives only
+# on the server; never commit it.
+/.env
+
 # IntelliJ
 out/
 

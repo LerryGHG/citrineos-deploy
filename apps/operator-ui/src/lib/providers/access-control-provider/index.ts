@@ -32,14 +32,17 @@ const ROLE_PERMISSIONS = {
     [ActionType.COMMAND]: true,
   },
   user: {
-    // Customize user access as needed; for now has the same permissions as Admin
+    // View only: sees everything, changes nothing and sends no commands to
+    // stations. This only decides what the UI offers - the same limits are
+    // enforced by Hasura (read-only `user` permissions in hasura-metadata)
+    // and by the CSMS API (apps/ocpp-server/rbac-rules.json).
     [ActionType.LIST]: true,
     [ActionType.SHOW]: true,
-    [ActionType.CREATE]: true,
-    [ActionType.EDIT]: true,
-    [ActionType.DELETE]: true,
+    [ActionType.CREATE]: false,
+    [ActionType.EDIT]: false,
+    [ActionType.DELETE]: false,
     [ActionType.ACCESS]: true,
-    [ActionType.COMMAND]: true,
+    [ActionType.COMMAND]: false,
   },
 };
 

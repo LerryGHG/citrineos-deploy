@@ -26,6 +26,11 @@
 # Specific directories to ignore
 **/ocpp-server/data
 
+# The server's secrets (scripts/init-env.sh) and deploy marker - never bake
+# them into an image, not even an intermediate build stage.
+/.env
+/.deployed-ip
+
 # VCS and CI/test artifacts (not needed in any image)
 .git
 **/playwright-report

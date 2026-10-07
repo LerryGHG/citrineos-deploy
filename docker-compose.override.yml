@@ -1,37 +1,53 @@
-# Local port remap to avoid clashing with an unrelated "ocpp-simulate"
-# container that also uses 3000 on this host.
-# `!override` fully replaces the base ports list instead of appending to it.
+# Deployment overrides for the self-hosted server stack.
+#
+# Everything that differs per server - its IP and every password/secret -
+# comes from a `.env` file next to this one, which docker compose reads
+# automatically for the ${...} references below. That file is gitignored and
+# exists only on the server; `scripts/init-env.sh` creates it, and
+# `scripts/set-server-ip.sh` updates SERVER_IP in it. So the tracked files are
+# never edited on the server and `git pull` there is always clean.
+#
+# Browsers reach the stack only through the `proxy` service, on one HTTPS
+# address (https://<SERVER_IP>). The databases, broker, object store, Hasura,
+# Keycloak and the CSMS REST API are no longer published on the host; only
+# the proxy and the OCPP ports chargers connect to are.
+#
+# `!override` replaces a base list instead of appending to it; `!reset`
+# removes the base value entirely.
 services:
   # Long-running services come back on their own after a reboot or a Docker
-  # restart. Without this only graphql-engine (which the base file marks
-  # `restart: always`) restarted, so everything else stayed down until someone
-  # ran `docker compose up` by hand. Docker's restart policy ignores
-  # depends_on, so at boot the services race each other; that's fine because
-  # one that starts before its database/broker just exits and is retried with
-  # backoff. The one-shot init containers (minio-init, db-init,
-  # hasura-metadata-init, keycloak-db-init) deliberately get NO policy:
-  # `unless-stopped` would re-run them forever once they finish. They only
-  # matter on the first `up` — what they set up persists in the databases.
-  # `unless-stopped` (not `always`) so a deliberate `docker compose stop`
-  # stays stopped across a Docker restart.
+  # restart. Docker's restart policy ignores depends_on, so at boot the
+  # services race each other; one that starts before its database/broker just
+  # exits and is retried with backoff. The one-shot init containers
+  # (minio-permissions-init, minio-init, db-init, hasura-metadata-init,
+  # keycloak-db-init) deliberately get NO policy: `unless-stopped` would re-run
+  # them forever once they finish. `unless-stopped` rather than `always` so a
+  # deliberate `docker compose stop` stays stopped across a Docker restart.
   ocpp-db:
     restart: unless-stopped
+    environment:
+      # Only read when the database is first created; changing it later
+      # needs an ALTER USER as well (see RUNBOOK.md).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env - see scripts/init-env.sh}
+    ports: !reset []
+
   amqp-broker:
     restart: unless-stopped
+    environment:
+      # Only read when RabbitMQ's data directory is first created.
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set in .env}
+    ports: !reset []
+
   # Both minio/minio and minio/mc on Docker Hub are gone entirely ("repository
-  # does not exist"), and quay.io/minio/* — where an earlier fix had already
-  # pinned these — now issues anonymous pull tokens with zero grants (401).
-  # MinIO's own free image distribution, not anything wrong with this deploy.
-  # bitnamilegacy/* (Bitnami's frozen-free mirror after their own registry
-  # went paid-catalog-only) still pulls anonymously as of this writing — if
-  # that stops working too, self-hosting a copy is the durable fix.
+  # does not exist"), and quay.io/minio/* now issues anonymous pull tokens with
+  # zero grants (401). bitnamilegacy/* (Bitnami's frozen-free mirror) still
+  # pulls anonymously; if that stops too, self-hosting a copy is the fix.
   #
-  # The image runs as a baked-in non-root uid (1001), which a bind-mounted
-  # host directory Docker creates fresh is owned root and unwritable by —
-  # minio-permissions-init fixes that before minio starts. Its own
-  # entrypoint.sh (github.com/bitnami/containers) execs `minio server ...`
-  # directly when the first arg is "server" (this repo's inherited base
-  # command), so no other base-file field needs changing for either service.
+  # The image runs as a baked-in non-root uid (1001), which can't write a
+  # bind-mounted host directory Docker creates fresh (owned root);
+  # minio-permissions-init fixes that before minio starts. Its entrypoint.sh
+  # execs `minio server ...` directly when the first arg is "server" (the base
+  # file's command), so nothing else in the base definition needs changing.
   minio-permissions-init:
     image: bitnamilegacy/minio:latest
     entrypoint: ['sh', '-c', 'mkdir -p /data && chown -R 1001:1001 /data']
@@ -41,39 +57,56 @@ services:
   minio:
     restart: unless-stopped
     image: bitnamilegacy/minio:latest
+    environment:
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set in .env}
+    ports: !reset []
     depends_on:
       minio-permissions-init:
         condition: service_completed_successfully
   minio-init:
     image: bitnamilegacy/minio-client:latest
+    environment:
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set in .env}
+    entrypoint: ['sh', '-c', 'mc alias set myminio http://minio:9000 minioadmin "$$MINIO_ROOT_PASSWORD"']
+
   graphql-engine:
     # The cli-migrations variant's entrypoint spins up a temporary internal
-    # server on :9691 and polls it over localhost to apply migrations before
-    # starting the real server; on this host that self-poll never succeeds
-    # within its 30s window and the container restart-loops forever. This repo
-    # only mounts Hasura *metadata* (not SQL migrations), so the migrations
-    # wrapper isn't needed — use the plain image instead.
+    # server on :9691 and polls it over localhost before starting the real
+    # one; on this host that self-poll never succeeds within its 30s window
+    # and the container restart-loops. This repo only mounts Hasura *metadata*
+    # (not SQL migrations), so use the plain image.
     image: hasura/graphql-engine:v2.40.3
     environment:
-      # The operator UI's data-provider already sends x-hasura-admin-secret
-      # (read from apps/operator-ui/.env.local's HASURA_ADMIN_SECRET) to get
-      # the real Hasura superadmin bypass. But the base compose file never
-      # configures a secret here, so Hasura had nothing to check that header
-      # against and fell back to enforcing role permissions — and the seeded
-      # metadata only defines permissions for a role named "user", never
-      # "admin", so the admin login could pass login but every mutation
-      # (e.g. creating a charging station) was denied. Setting the same
-      # secret here restores the intended superadmin bypass.
-      HASURA_GRAPHQL_ADMIN_SECRET: 'CitrineOS!'
-  # The plain image swapped in above never auto-applies Hasura metadata on
-  # startup the way the cli-migrations variant normally would (that's its
-  # whole job — see the comment on graphql-engine). On a brand-new database
-  # this leaves zero tables tracked in Hasura (GraphQL queries return
-  # "no_queries_available") until someone applies it by hand, which is a trap
-  # for the next fresh deploy. This one-shot container does it automatically
-  # on every `up`, using the cli-migrations image's own bundled `hasura-cli`
-  # binary against the already-running plain server — idempotent, safe to
-  # re-run against a database that's already had it applied.
+      HASURA_GRAPHQL_DATABASE_URL: postgres://citrine:${POSTGRES_PASSWORD:?set in .env}@ocpp-db:5432/citrine
+      # Server-side only now (hasura-metadata-init uses it). Browsers used to
+      # be handed this secret, which let every logged-in account - `user`
+      # included - bypass all permissions. They now authenticate with their
+      # Keycloak token instead (HASURA_GRAPHQL_JWT_SECRET below).
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_ADMIN_SECRET:?set in .env}
+      # Verify Keycloak access tokens and take the Hasura role from the
+      # `roles` claim (a protocol mapper on the citrineos-ui client puts the
+      # user's client roles there). `admin` gets Hasura's full access; `user`
+      # gets the read-only permissions in hasura-metadata. No issuer check:
+      # the issuer contains the server IP, and the signature already ties the
+      # token to this realm's keys.
+      HASURA_GRAPHQL_JWT_SECRET: >-
+        {"jwk_url": "http://keycloak:8080/auth/realms/citrineos/protocol/openid-connect/certs",
+         "claims_map": {"x-hasura-allowed-roles": {"path": "$$.roles"},
+                        "x-hasura-default-role": {"path": "$$.roles[0]"},
+                        "x-hasura-user-id": {"path": "$$.sub"},
+                        "x-hasura-tenant-id": {"path": "$$.tenant_id", "default": "1"}}}
+      # The console isn't reachable through the proxy anyway; dev mode would
+      # put internal error details into API responses.
+      HASURA_GRAPHQL_ENABLE_CONSOLE: 'false'
+      HASURA_GRAPHQL_DEV_MODE: 'false'
+    ports: !reset []
+    # Hasura exits if it can't fetch Keycloak's signing keys at startup. At
+    # boot the restart policy retries until Keycloak is up; this makes
+    # `docker compose up` wait instead of giving up on everything after it.
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
   # One-shot, idempotent SQL applied on every start (files in apps/ocpp-server/sql):
   #  - card-labels.sql: the CardLabels table (friendly names for RFID cards) used
   #    by the operator UI's Cars tab. Must finish before Hasura metadata is
@@ -84,7 +117,7 @@ services:
     entrypoint: ['psql']
     command: ['-v', 'ON_ERROR_STOP=1', '-h', 'ocpp-db', '-U', 'citrine', '-d', 'citrine', '-f', '/sql/card-labels.sql', '-f', '/sql/station-delete-fix.sql']
     environment:
-      PGPASSWORD: citrine
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set in .env}
     volumes:
       - ./apps/ocpp-server/sql:/sql:ro
     depends_on:
@@ -92,10 +125,15 @@ services:
         condition: service_healthy
       citrine:
         condition: service_healthy
+
+  # The plain Hasura image never auto-applies metadata the way the
+  # cli-migrations variant would, so on a brand-new database no tables would be
+  # tracked ("no_queries_available"). This applies it on every `up` with the
+  # cli-migrations image's bundled hasura-cli - idempotent.
   hasura-metadata-init:
     image: hasura/graphql-engine:v2.40.3.cli-migrations-v3
     entrypoint: ['hasura-cli']
-    command: ['metadata', 'apply', '--admin-secret', 'CitrineOS!', '--skip-update-check']
+    command: ['metadata', 'apply', '--admin-secret', '${HASURA_ADMIN_SECRET:?set in .env}', '--skip-update-check']
     working_dir: /project
     volumes:
       - ./apps/ocpp-server/config.yaml:/project/config.yaml
@@ -107,34 +145,69 @@ services:
         condition: service_healthy
       db-init:
         condition: service_completed_successfully
-  # Same trap as citrine-ui below, and a nastier one: the base file's
-  # `pull_policy: always` makes every plain `docker compose up -d` re-pull
-  # upstream's latest citrineos-server over the image built locally from this
-  # repo (docker-compose.local.yml). Upstream's image has a different layout
-  # (smaller, different working dir), so the CSMS then dies at startup with
-  # "Websocket servers config file not found" and the tag is silently gone.
-  # Build it once with `docker compose ... build citrine`.
+
+  # The base file's `pull_policy: always` would make every plain
+  # `docker compose up -d` re-pull upstream's citrineos-server over the image
+  # built locally from this repo (docker-compose.local.yml). Upstream's image
+  # has a different layout, so the CSMS then dies at startup with "Websocket
+  # servers config file not found". Build it with `docker compose ... build citrine`.
   citrine:
     pull_policy: never
     restart: unless-stopped
+    environment:
+      CITRINEOS_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      CITRINEOS_MESSAGEBROKER_AMQP_URL: amqp://guest:${RABBITMQ_PASSWORD:?set in .env}@amqp-broker:5672
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?set in .env}
+      # The REST API (station commands) used to accept requests from anyone on
+      # the network with no login. Verify the caller's Keycloak token and apply
+      # rbac-rules.json (mounted below). Issuer/audience left empty on purpose,
+      # same reason as Hasura's: the signature is checked against this realm.
+      CITRINEOS_AUTH: >-
+        {"oidc": {"jwksUri": "http://keycloak:8080/auth/realms/citrineos/protocol/openid-connect/certs",
+                  "issuer": "", "audience": ""}}
+    volumes:
+      # The loader reads rbac-rules.json from the process working directory,
+      # which in the image is the repo root, not apps/ocpp-server where the
+      # file lives - without this every request would be denied.
+      - ./apps/ocpp-server/rbac-rules.json:/usr/local/apps/citrineos/rbac-rules.json:ro
+    # Only what chargers connect to. The REST API (8080) is reachable through
+    # the proxy at /core; 9229 (Node inspector) was published but unused.
+    ports: !override
+      - 8081:8081
+      - 8082:8082
+      - 8443:8443
+      - 8444:8444
+
   citrine-ui:
     restart: unless-stopped
     depends_on:
       hasura-metadata-init:
         condition: service_completed_successfully
-    ports: !override
-      - "3010:3000"
-    # The base file sets pull_policy: always, which re-pulls and clobbers a
-    # locally-built image sharing the same tag. Pin to the local image once
-    # `docker compose -f docker-compose.yml -f docker-compose.local.yml build
-    # citrine-ui` has been run (see docker-compose.local.yml).
+    build:
+      args:
+        NEXT_PUBLIC_API_URL: https://${SERVER_IP:?set in .env}/v1/graphql
+        NEXT_PUBLIC_WS_URL: wss://${SERVER_IP:?set in .env}/v1/graphql
+        NEXT_PUBLIC_CITRINE_CORE_URL: https://${SERVER_IP:?set in .env}/core
+        NEXT_PUBLIC_KEYCLOAK_URL: https://${SERVER_IP:?set in .env}/auth
+    # These take precedence over the env_file (.env.local) the base file adds.
+    environment:
+      NEXTAUTH_URL: https://${SERVER_IP:?set in .env}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?set in .env}
+      NEXT_PUBLIC_KEYCLOAK_URL: https://${SERVER_IP:?set in .env}/auth
+      # Server-to-server calls from the UI container go straight to Keycloak.
+      KEYCLOAK_SERVER_URL: http://keycloak:8080/auth
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:?set in .env}
+      # Empty on purpose: with no admin secret the UI authorizes every Hasura
+      # request with the user's own token, so permissions actually apply.
+      HASURA_ADMIN_SECRET: ''
+    ports: !reset []
+    # The base file sets pull_policy: always, which would re-pull upstream's
+    # image over the one built locally (see docker-compose.local.yml).
     pull_policy: never
 
   # Keycloak needs its own database. ocpp-db already runs Postgres for
-  # everything else, so this just adds a second database ("keycloak") on the
-  # same instance rather than standing up another Postgres container. The
-  # \gexec guard makes the CREATE DATABASE idempotent across repeated `up`s
-  # (plain CREATE DATABASE errors if it already exists).
+  # everything else, so this adds a second database ("keycloak") on the same
+  # instance. Idempotent: plain CREATE DATABASE errors if it already exists.
   keycloak-db-init:
     image: postgis/postgis:16-3.5
     entrypoint: ['sh', '-c']
@@ -145,21 +218,17 @@ services:
         psql -v ON_ERROR_STOP=1 -h ocpp-db -U citrine -d citrine -c
         "CREATE DATABASE keycloak OWNER citrine"
     environment:
-      PGPASSWORD: citrine
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set in .env}
     depends_on:
       ocpp-db:
         condition: service_healthy
 
-  # Identity provider backing the operator UI's admin/user login split (real
-  # Keycloak accounts instead of the single hardcoded "generic" admin login).
-  # KC_HOSTNAME is fixed rather than dynamically detected: Keycloak issues
-  # tokens with `iss` set to KC_HOSTNAME regardless of which URL a request
-  # actually came in on, which keeps the browser-facing login (via the
-  # published :8180 port) and the operator-ui container's internal
-  # server-to-server calls (via the `keycloak` service name) consistent. On
-  # every redeploy with a new server IP, update KC_HOSTNAME here the same way
-  # apps/operator-ui/.env.local's NEXT_PUBLIC_KEYCLOAK_URL gets updated (both
-  # currently say "localhost" and must be changed together).
+  # Identity provider behind the operator UI's admin/user login split. Served
+  # under /auth through the proxy. KC_HOSTNAME is fixed rather than detected:
+  # Keycloak puts it in every token's `iss`, and the UI checks `iss` against
+  # NEXT_PUBLIC_KEYCLOAK_URL - fixing it keeps tokens identical whether they
+  # were fetched by the browser (through the proxy) or by the UI container
+  # (directly, as keycloak:8080).
   keycloak:
     restart: unless-stopped
     image: quay.io/keycloak/keycloak:latest
@@ -168,16 +237,53 @@ services:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://ocpp-db:5432/keycloak
       KC_DB_USERNAME: citrine
-      KC_DB_PASSWORD: citrine
-      KC_HOSTNAME: http://localhost:8180
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+      KC_HOSTNAME: https://${SERVER_IP:?set in .env}/auth
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: 'true'
+      # Read only on the very first start, to create the console admin.
       KC_BOOTSTRAP_ADMIN_USERNAME: kcadmin
-      # Generate a real value at deploy time (e.g. `openssl rand -base64 24`) —
-      # this placeholder is intentionally not a working credential.
-      KC_BOOTSTRAP_ADMIN_PASSWORD: 'REPLACE_WITH_GENERATED_SECRET'
-    ports:
-      - '8180:8080'
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:?set in .env}
+      # Substituted into apps/ocpp-server/keycloak/citrineos-realm.json, which
+      # is only imported when the realm doesn't exist yet. Afterwards change
+      # passwords in the Keycloak console, not here.
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:?set in .env}
+      CITRINEOS_ADMIN_PASSWORD: ${CITRINEOS_ADMIN_PASSWORD:?set in .env}
+      CITRINEOS_USER_PASSWORD: ${CITRINEOS_USER_PASSWORD:?set in .env}
+    ports: !reset []
     volumes:
       - ./apps/ocpp-server/keycloak:/opt/keycloak/data/import:ro
+    # Readiness from the management port (KC_HEALTH_ENABLED). The image has
+    # no curl or wget, so speak HTTP over bash's /dev/tcp; 503 until ready.
+    healthcheck:
+      test: ['CMD-SHELL', 'exec 3<>/dev/tcp/127.0.0.1/9000 && printf "GET /auth/health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3 && head -1 <&3 | grep -q " 200 "']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     depends_on:
       keycloak-db-init:
         condition: service_completed_successfully
+
+  # The single HTTPS entry point (see apps/ocpp-server/proxy/Caddyfile).
+  proxy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      SERVER_IP: ${SERVER_IP:?set in .env}
+    ports:
+      - 80:80
+      - 443:443
+      # Old addresses, kept only as redirects to https://<SERVER_IP>.
+      - 3010:3010
+      - 8180:8180
+    volumes:
+      - ./apps/ocpp-server/proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Caddy's local CA and certificates; must persist (see the Caddyfile).
+      - ./apps/ocpp-server/data/caddy:/data
+    depends_on:
+      - citrine-ui
+      - keycloak
+      - graphql-engine
+      - citrine

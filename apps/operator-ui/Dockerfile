@@ -13,7 +13,21 @@ WORKDIR /app
 COPY . .
 
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter "@citrineos/operator-ui..." build
+
+# Browser-facing URLs are inlined into the bundle at build time. Passed as
+# build args (docker-compose.override.yml builds them from SERVER_IP in the
+# server's .env) they win over the localhost defaults in .env.local, so the
+# tracked file never has to be edited per server. Declared after the install
+# step so changing the address only reruns the build, not the install. Unset
+# (not empty) when not passed, so a plain build still uses .env.local.
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WS_URL
+ARG NEXT_PUBLIC_CITRINE_CORE_URL
+ARG NEXT_PUBLIC_KEYCLOAK_URL
+RUN for v in NEXT_PUBLIC_API_URL NEXT_PUBLIC_WS_URL NEXT_PUBLIC_CITRINE_CORE_URL NEXT_PUBLIC_KEYCLOAK_URL; do \
+      eval "[ -n \"\${$v}\" ]" || unset "$v"; \
+    done; \
+    pnpm --filter "@citrineos/operator-ui..." build
 
 FROM node:24.16.0-alpine AS runner
 

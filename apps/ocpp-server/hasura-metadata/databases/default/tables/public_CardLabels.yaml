@@ -4,3 +4,13 @@
 table:
   name: CardLabels
   schema: public
+# View-only `user` accounts see the driver/car names in the Cars tab, cost
+# calculator and billing. Only admins change them (Hasura's admin role needs
+# no permission entry). The table has no tenantId column, so no row filter.
+select_permissions:
+  - role: user
+    permission:
+      columns: '*'
+      filter: {}
+      allow_aggregations: true
+    comment: ''

@@ -1,0 +1,44 @@
+# Single HTTPS entry point for everything a browser talks to, so the operator
+# UI, Keycloak, Hasura and the CSMS API share one origin: https://<SERVER_IP>.
+#
+# The server has no public DNS name, so Let's Encrypt is out: Caddy signs the
+# certificate with its own local CA instead. Its state lives in
+# apps/ocpp-server/data/caddy (mounted at /data) so the CA - and therefore
+# whatever browsers have accepted or installed - survives restarts. Browsers
+# warn once unless that CA's root is installed; see RUNBOOK.md.
+{
+	local_certs
+	skip_install_trust
+	# Browsers send no SNI when the address is an IP, so name the default.
+	default_sni {$SERVER_IP}
+}
+
+https://{$SERVER_IP} {
+	# CitrineOS core REST API (station commands). Mounted under /core and
+	# stripped, so the CSMS sees its own paths (/ocpp/..., /commands/...).
+	handle_path /core/* {
+		reverse_proxy citrine:8080
+	}
+	# Keycloak runs with KC_HTTP_RELATIVE_PATH=/auth, so no stripping.
+	handle /auth/* {
+		reverse_proxy keycloak:8080
+	}
+	# Hasura GraphQL; websocket subscriptions use the same path.
+	handle /v1/graphql {
+		reverse_proxy graphql-engine:8080
+	}
+	handle {
+		reverse_proxy citrine-ui:3000
+	}
+}
+
+# Plain HTTP lands on the HTTPS app. The old per-service ports keep working as
+# redirects so existing bookmarks don't just fail: the UI's paths are the same
+# behind the proxy, Keycloak's aren't (it moved under /auth), so that one goes
+# to the front page.
+http://{$SERVER_IP}, http://{$SERVER_IP}:3010 {
+	redir https://{$SERVER_IP}{uri}
+}
+http://{$SERVER_IP}:8180 {
+	redir https://{$SERVER_IP}/
+}

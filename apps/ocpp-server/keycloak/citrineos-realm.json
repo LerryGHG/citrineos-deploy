@@ -16,20 +16,38 @@
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
-      "secret": "REPLACE_WITH_GENERATED_CLIENT_SECRET",
+      "secret": "${KEYCLOAK_CLIENT_SECRET}",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
       "fullScopeAllowed": true,
       "redirectUris": ["*"],
-      "webOrigins": ["*"]
+      "webOrigins": ["*"],
+      "protocolMappers": [
+        {
+          "name": "roles (top-level claim)",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "usermodel.clientRoleMapping.clientId": "citrineos-ui",
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "userinfo.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
     }
   ],
   "roles": {
     "client": {
       "citrineos-ui": [
         { "name": "admin", "description": "Full access to the operator UI" },
-        { "name": "user", "description": "Restricted access to the operator UI" }
+        { "name": "user", "description": "View-only access to the operator UI" }
       ]
     }
   },
@@ -42,7 +60,7 @@
       "firstName": "Admin",
       "lastName": "User",
       "credentials": [
-        { "type": "password", "value": "REPLACE_WITH_GENERATED_ADMIN_PASSWORD", "temporary": true }
+        { "type": "password", "value": "${CITRINEOS_ADMIN_PASSWORD}", "temporary": false }
       ],
       "clientRoles": { "citrineos-ui": ["admin"] }
     },
@@ -54,7 +72,7 @@
       "firstName": "Standard",
       "lastName": "User",
       "credentials": [
-        { "type": "password", "value": "REPLACE_WITH_GENERATED_USER_PASSWORD", "temporary": true }
+        { "type": "password", "value": "${CITRINEOS_USER_PASSWORD}", "temporary": false }
       ],
       "clientRoles": { "citrineos-ui": ["user"] }
     }

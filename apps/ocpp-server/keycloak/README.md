@@ -1,37 +1,27 @@
 # Keycloak realm import
 
-`citrineos-realm.json` is imported automatically by the `keycloak` service
-(`docker-compose.override.yml`) on every `up` — see that service's comments
-for how `KC_HOSTNAME` keeps the issued tokens consistent across a changing
-server IP.
+`citrineos-realm.json` is imported by the `keycloak` service
+(`docker-compose.override.yml`, started with `--import-realm`) when the
+`citrineos` realm doesn't exist yet - i.e. on a brand-new Keycloak database.
+Afterwards the import is skipped (`IGNORE_EXISTING`), so editing this file
+does **not** change an existing realm: change things in the Keycloak console
+(`https://<server-ip>/auth/admin`) instead.
 
 It seeds:
-- Realm `citrineos`, client `citrineos-ui` (confidential, redirect URIs `*`
-  since the deploy server's IP isn't stable — see docker-compose.override.yml).
-- Two client roles on that client: `admin` and `user`. The operator UI reads
-  these out of the access token's `resource_access.citrineos-ui.roles` to
-  decide which role a logged-in user gets (see
-  `apps/operator-ui/src/lib/providers/auth-provider/keycloak-auth-provider`).
+- Realm `citrineos` with a password policy (min. 8 characters, not the
+  username or email) and brute-force protection (5 failed attempts lock the
+  account with escalating waits, capped at 15 minutes).
+- Client `citrineos-ui` (confidential; redirect URIs `*` because the server's
+  IP isn't stable) with a protocol mapper that puts the user's client roles
+  into a top-level `roles` claim of the access token. Hasura and the CSMS API
+  both read the role from there (see RUNBOOK.md, "Accounts and what they can
+  do"); the operator UI reads `resource_access.citrineos-ui.roles`.
+- Two client roles, `admin` (full access) and `user` (view only).
 - Two users, `admin` and `user`, one per role.
-- A password policy (min. 8 characters, can't match the username or email)
-  and brute-force protection (5 failed attempts locks the account out with
-  escalating wait times, capped at 15 minutes).
 
-**The `REPLACE_WITH_GENERATED_*` values in the committed file are placeholders,
-not working credentials** — real secrets are never committed here (a git
-credential-leakage guard blocks it, and it'd be a bad idea regardless).
-Before a fresh deploy, generate real values (e.g. `openssl rand -base64 24`
-or PowerShell's `-join ((48..57)+(65..90)+(97..122)|Get-Random -Count 24|%{[char]$_})`)
-and substitute them into the server's own copy of this file plus the matching
-`KC_BOOTSTRAP_ADMIN_PASSWORD` in `docker-compose.override.yml` and
-`KEYCLOAK_CLIENT_SECRET` in `apps/operator-ui/.env.local` (the client secret
-must be identical in both places) — the same one-off substitution step
-already used for the server's IP in those files. Both placeholder user
-passwords are marked `"temporary": true`, so Keycloak will force a password
-reset on first login if they're ever imported as-is.
-
-Realm import uses Keycloak's `IGNORE_EXISTING` strategy, so re-running `up`
-against a server that already has the `citrineos` realm is a no-op — editing
-this file and redeploying does **not** update an already-imported realm.
-Change users/roles/clients through the Keycloak admin console
-(`http://<server>:8180`, `kcadmin` / the bootstrap password) instead.
+The client secret and both passwords are `${...}` placeholders. Keycloak
+fills them in from its own environment at import time, and
+docker-compose.override.yml passes them from the server's `.env`
+(`KEYCLOAK_CLIENT_SECRET`, `CITRINEOS_ADMIN_PASSWORD`,
+`CITRINEOS_USER_PASSWORD`, created by `scripts/init-env.sh`). So no secret is
+ever written into this file.

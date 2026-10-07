@@ -4,7 +4,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { CanAccess, useCustomMutation, useTranslate } from '@refinedev/core';
+import { CanAccess, useCan, useCustomMutation, useTranslate } from '@refinedev/core';
 import { Card, CardContent, CardHeader } from '@lib/client/components/ui/card';
 import { Badge } from '@lib/client/components/ui/badge';
 import { Button } from '@lib/client/components/ui/button';
@@ -52,6 +52,9 @@ export const CarsList: React.FC = () => {
   } = useGqlCustom({ gqlQuery: CARS_OVERVIEW_QUERY });
 
   const { mutate } = useCustomMutation();
+  // View-only accounts get the names as plain text; the API would reject a save anyway.
+  const { data: editAccess } = useCan({ resource: ResourceType.PARTNERS, action: ActionType.EDIT });
+  const canEdit = editAccess?.can ?? false;
 
   const authorizations: AuthorizationRow[] = (data?.data as any)?.Authorizations ?? [];
   const labels: LabelRow[] = (data?.data as any)?.CardLabels ?? [];
@@ -166,7 +169,7 @@ export const CarsList: React.FC = () => {
                     <TableHead>{translate('Cars.driver')}</TableHead>
                     <TableHead>{translate('Cars.car')}</TableHead>
                     <TableHead>{translate('Cars.notes')}</TableHead>
-                    <TableHead className="w-24" />
+                    {canEdit && <TableHead className="w-24" />}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -181,38 +184,48 @@ export const CarsList: React.FC = () => {
                             {auth.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          <Input
-                            value={draft.name}
-                            onChange={(e) => updateDraft(auth.idToken, 'name', e.target.value)}
-                            placeholder={translate('Cars.driverPlaceholder')}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            value={draft.car}
-                            onChange={(e) => updateDraft(auth.idToken, 'car', e.target.value)}
-                            placeholder={translate('Cars.carPlaceholder')}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            value={draft.notes}
-                            onChange={(e) => updateDraft(auth.idToken, 'notes', e.target.value)}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            size="sm"
-                            variant={dirty ? 'success' : 'outline'}
-                            disabled={!dirty || savingKey === auth.idToken}
-                            onClick={() => save(auth.idToken)}
-                          >
-                            {savingKey === auth.idToken
-                              ? translate('Cars.saving')
-                              : translate('Cars.save')}
-                          </Button>
-                        </TableCell>
+                        {canEdit ? (
+                          <>
+                            <TableCell>
+                              <Input
+                                value={draft.name}
+                                onChange={(e) => updateDraft(auth.idToken, 'name', e.target.value)}
+                                placeholder={translate('Cars.driverPlaceholder')}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={draft.car}
+                                onChange={(e) => updateDraft(auth.idToken, 'car', e.target.value)}
+                                placeholder={translate('Cars.carPlaceholder')}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={draft.notes}
+                                onChange={(e) => updateDraft(auth.idToken, 'notes', e.target.value)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant={dirty ? 'success' : 'outline'}
+                                disabled={!dirty || savingKey === auth.idToken}
+                                onClick={() => save(auth.idToken)}
+                              >
+                                {savingKey === auth.idToken
+                                  ? translate('Cars.saving')
+                                  : translate('Cars.save')}
+                              </Button>
+                            </TableCell>
+                          </>
+                        ) : (
+                          <>
+                            <TableCell>{draft.name}</TableCell>
+                            <TableCell>{draft.car}</TableCell>
+                            <TableCell>{draft.notes}</TableCell>
+                          </>
+                        )}
                       </TableRow>
                     );
                   })}

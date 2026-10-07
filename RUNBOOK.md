@@ -57,6 +57,7 @@ On a new server with Docker and git:
 cd /home/maw
 git clone --branch server-deploy https://github.com/LerryGHG/citrineos-deploy.git citrineos
 cd citrineos
+cp scripts/docker-daemon.json /etc/docker/daemon.json && systemctl restart docker  # log + build cache limits, see "Disk space"
 ./scripts/init-env.sh        # creates .env with the IP and random secrets; prints the login passwords
 C="docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.override.yml --profile ui"
 $C build citrine citrine-ui  # both are built from this repo, never pulled
@@ -134,6 +135,36 @@ root).
 
 The OCPP ports chargers use are unchanged (plain `ws://` on 8081; TLS
 profiles on 8443/8444 use the CSMS's own certificates, not Caddy's).
+
+## Disk space: logs and build cache
+
+Docker's own settings are in `/etc/docker/daemon.json`, a copy of
+`scripts/docker-daemon.json`. Without them, both of these grow until the disk
+is full:
+
+- **Container logs** rotate at 50 MB and keep 5 files, with the older ones
+  gzipped, so no container's logs can exceed 250 MB. The CSMS logs every OCPP
+  message (about 55 MB a day with the four simulators), so `docker logs`
+  goes back roughly four days for it and much longer for everything else.
+- **Build cache**: kept under 10 GB. Docker's default only starts clearing it
+  at about 75% of the disk, and it had reached 40 GB. `docker builder prune`
+  clears it completely; the next build then takes longer.
+
+`docker system df` shows what's using space. To change the settings, edit
+the file in the repo and copy it over again. A Docker restart is needed, and
+the log limits only apply to containers created afterwards, so recreate
+them. `down` keeps all data. Allow about a minute of downtime:
+
+```bash
+cd /home/maw/citrine-sim && docker compose down   # it uses the citrineos network, so it goes first
+cd /home/maw/citrineos && $C down
+cp scripts/docker-daemon.json /etc/docker/daemon.json && systemctl restart docker
+$C up -d
+cd /home/maw/citrine-sim && docker compose up -d
+```
+
+Portainer (`docker run`, not Compose) keeps the old unlimited log setting
+until it's recreated. It hardly logs anything, so that doesn't matter.
 
 ## Accounts and what they can do
 

@@ -3,17 +3,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { test, expect } from '../../fixtures';
-import { TariffsListPage } from '../../pages/tariffs/list-page';
+import { CostCalculatorPage } from '../../pages/cost-calculator/cost-calculator-page';
 import { TariffFormPage } from '../../pages/tariffs/form-page';
 
 test.use({ storageState: 'playwright/.auth/admin.json' });
 
+// /tariffs itself now shows the Cost Calculator (see specs/cost-calculator);
+// the tariff form and detail pages still live under /tariffs/new and /tariffs/:id.
 test.describe('tariffs › CRUD', () => {
-  test('E2E-110: Tariffs list renders', async ({ page }) => {
-    const list = new TariffsListPage(page);
-    await list.goto();
-    await expect(list.heading).toBeVisible();
-    await expect(list.addButton).toBeVisible();
+  test('E2E-110: /tariffs shows the cost calculator', async ({ page }) => {
+    const calculator = new CostCalculatorPage(page);
+    await calculator.goto();
+    await expect(calculator.priceInput).toBeVisible();
+    await expect(calculator.calculatorTab).toBeVisible();
+    await expect(calculator.billingTab).toBeVisible();
   });
 
   test('E2E-111: Create tariff via UI surfaces success toast', async ({ page, apiClient }) => {
@@ -72,16 +75,14 @@ test.describe('tariffs › CRUD', () => {
       await expect(deleteButton).toBeVisible({ timeout: 30_000 });
       await deleteButton.click();
 
+      // Deleting redirects to the resource's list route, which is now the
+      // cost calculator - so check the row is gone in the database instead.
       await page.waitForURL(/\/tariffs$/, { timeout: 30_000 });
-      const list = new TariffsListPage(page);
-      await expect(list.heading).toBeVisible();
-      // Match the id cell exactly — a substring match on the whole row also
-      // hits price cells (id 47 vs a 0.47 price from a concurrent test).
-      await expect(
-        page
-          .getByRole('row')
-          .filter({ has: page.getByRole('cell', { name: String(created.id), exact: true }) }),
-      ).toHaveCount(0);
+      await expect(new CostCalculatorPage(page).heading).toBeVisible({ timeout: 30_000 });
+      const { Tariffs_by_pk: remaining } = await apiClient.gql<{
+        Tariffs_by_pk: { id: number } | null;
+      }>(`query TariffGone($id: Int!) { Tariffs_by_pk(id: $id) { id } }`, { id: created.id });
+      expect(remaining).toBeNull();
     } finally {
       await apiClient
         .gql(

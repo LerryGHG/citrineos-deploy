@@ -3,18 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { test, expect } from '../../fixtures';
-import { PartnersListPage } from '../../pages/partners/list-page';
 import { PartnerFormPage } from '../../pages/partners/form-page';
 
 test.use({ storageState: 'playwright/.auth/admin.json' });
 
+// /partners itself now shows Cars / Drivers (see specs/cars); the partner
+// form pages still live under /partners/new and /partners/:id.
 test.describe('partners › register', () => {
-  test('E2E-120: Partners list renders', async ({ page }) => {
-    const list = new PartnersListPage(page);
-    await list.goto();
-    await expect(list.heading).toBeVisible();
-  });
-
   test('E2E-121: Register new partner via UI surfaces success toast', async ({
     page,
     apiClient,

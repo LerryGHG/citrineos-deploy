@@ -13,12 +13,9 @@ export class OverviewPage {
   readonly welcomeCloseButton: Locator;
 
   readonly kpiOnlineHeading: Locator;
-  readonly kpiActiveTransactionsHeading: Locator;
-  readonly kpiPluginSuccessHeading: Locator;
   readonly kpiChargerActivityHeading: Locator;
-  readonly faultedChargersHeading: Locator;
-  readonly locationsCardHeading: Locator;
-  readonly locationsMapSurface: Locator;
+  readonly liveMonitorHeading: Locator;
+  readonly stationsHeading: Locator;
 
   readonly expandSidebarButton: Locator;
   readonly collapseSidebarButton: Locator;
@@ -35,29 +32,22 @@ export class OverviewPage {
       name: /close/i,
     });
 
+    // The dashboard is: Charger Online Status, Charger Activity and Live
+    // Monitor across the top, and one Stations card (one tile per station,
+    // with its live sessions) underneath. The old Active Transactions,
+    // Plug-In Success Rate and Locations/map cards are gone.
     this.kpiOnlineHeading = page.getByRole('heading', {
       name: /charger online status/i,
-    });
-    this.kpiActiveTransactionsHeading = page.getByRole('heading', {
-      name: /active transactions/i,
-    });
-    this.kpiPluginSuccessHeading = page.getByRole('heading', {
-      name: /plug-?in success rate/i,
     });
     this.kpiChargerActivityHeading = page.getByRole('heading', {
       name: /charger activity/i,
     });
-    this.faultedChargersHeading = page.getByRole('heading', {
-      name: /faulted chargers/i,
+    this.liveMonitorHeading = page.getByRole('heading', {
+      name: /^live monitor$/i,
     });
-    this.locationsCardHeading = page.getByRole('heading', {
-      name: /^locations$/i,
+    this.stationsHeading = page.getByRole('heading', {
+      name: /^stations$/i,
     });
-    // The Google Maps SDK only mounts its `.gm-style` tile container after it
-    // authenticates a valid API key; with the placeholder key it never appears.
-    // Asserting on it (rather than the statically-rendered card heading) proves
-    // the key-gated map surface actually rendered.
-    this.locationsMapSurface = page.locator('.gm-style').first();
 
     this.expandSidebarButton = page.getByRole('button', {
       name: /expand sidebar/i,
@@ -76,15 +66,11 @@ export class OverviewPage {
   }
 
   async expectLoaded(): Promise<void> {
-    // Anchor on the Locations card heading, which renders without a Hasura
-    // query dependency. The Charger Online Status heading sits inside a
-    // query-bound skeleton and times out when the server is under sustained
-    // load. Tests that need to assert specific KPI headings do so
-    // individually in their own expectations, not via this load gate. A
-    // one-shot reload retry catches the rare stalled response.
-    // The first attempt is capped at 45s so the reload retry still fits
-    // inside the 150s test budget (45 + 30 reload + 60 leaves headroom);
-    // the old 60+60+60 worst case blew past it and died as a bare timeout.
+    // Anchor on the Stations card heading. Every card shows a skeleton until
+    // its Hasura query returns, so there is no query-free heading to wait on
+    // any more; Stations is the main content and the one most tests look at.
+    // A one-shot reload retry catches the rare stalled response. The first
+    // attempt is capped at 45s so the retry still fits the 150s test budget.
     try {
       await this.settleOverview(45_000);
     } catch {
@@ -98,11 +84,11 @@ export class OverviewPage {
 
   private async settleOverview(timeout: number): Promise<void> {
     await Promise.race([
-      this.locationsCardHeading.waitFor({ state: 'visible', timeout }),
+      this.stationsHeading.waitFor({ state: 'visible', timeout }),
       this.welcomeDialog.waitFor({ state: 'visible', timeout }),
     ]);
     await this.dismissWelcomeIfPresent();
-    await expect(this.locationsCardHeading).toBeVisible({ timeout });
+    await expect(this.stationsHeading).toBeVisible({ timeout });
   }
 
   async dismissWelcomeIfPresent(waitMs = 0): Promise<void> {
@@ -122,6 +108,14 @@ export class OverviewPage {
       await this.welcomeCloseButton.click();
       await expect(this.welcomeDialog).toBeHidden({ timeout: 15_000 });
     }
+  }
+
+  /** The tile for one station inside the Stations card. */
+  stationTile(ocppConnectionName: string): Locator {
+    // Each tile is a clickable bordered box (it links to the station page).
+    return this.page
+      .locator('div.cursor-pointer.rounded-lg.border')
+      .filter({ has: this.page.getByText(ocppConnectionName, { exact: true }) });
   }
 
   async expandSidebar(): Promise<void> {

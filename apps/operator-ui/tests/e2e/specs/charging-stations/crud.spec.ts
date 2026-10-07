@@ -102,6 +102,10 @@ test.describe('charging-stations › CRUD', () => {
       await page.goto(`/charging-stations/${created.id}`);
       const deleteButton = page.getByRole('button', { name: /^delete/i });
       await expect(deleteButton).toBeEnabled({ timeout: 30_000 });
+      // The button asks for confirmation with a native window.confirm().
+      // Playwright dismisses unhandled dialogs, which is Cancel - so without
+      // this the station is never deleted and the redirect never comes.
+      page.once('dialog', (dialog) => dialog.accept());
       await deleteButton.click();
 
       await page.waitForURL(/\/charging-stations$/, { timeout: 30_000 });

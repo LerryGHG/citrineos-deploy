@@ -73,37 +73,37 @@ before regenerating anything.
 
 ## When the server's IP changes
 
-This has happened three times so far (redeploys and reboots both do it) and
-is the single biggest source of repeated breakage. Four files/values need
-the new IP, and it's easy to miss one:
-
-1. **`apps/operator-ui/.env.local`** — `NEXT_PUBLIC_API_URL`,
-   `NEXT_PUBLIC_WS_URL`, `NEXT_PUBLIC_CITRINE_CORE_URL`,
-   `NEXT_PUBLIC_FILE_SERVER_URL`, `NEXTAUTH_URL`, `NEXT_PUBLIC_KEYCLOAK_URL`.
-   These are baked into the browser bundle at *build* time, so a container
-   restart alone won't pick up a fix — the UI needs rebuilding after.
-2. **`docker-compose.override.yml`** — the `keycloak` service's
-   `KC_HOSTNAME`. Must match `NEXT_PUBLIC_KEYCLOAK_URL` above exactly, or
-   Keycloak issues tokens with an `iss` claim the UI won't accept.
-
-Both files use `http://localhost:...` as their tracked placeholder, so one
-command fixes both in one pass on the server's copy:
+This keeps happening (reboots and redeploys both do it) and was the single
+biggest source of repeated breakage. One command on the server handles it:
 
 ```bash
-cd /home/maw/citrineos
-sed -i 's#://localhost:#://<new-ip>:#g' apps/operator-ui/.env.local docker-compose.override.yml
-docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.override.yml --profile ui up -d --build citrine-ui
+/home/maw/citrineos/scripts/set-server-ip.sh            # detects the IP
+/home/maw/citrineos/scripts/set-server-ip.sh 10.40.2.48 # or name it
 ```
 
-The `up -d` also picks up and recreates `keycloak` automatically since its
-config changed. **Never commit the server's `sed`'d copies back** — the
-tracked versions must stay on `localhost` placeholders, exactly like this,
-or the next fresh clone starts broken.
+What it changes, so you know what to check if it ever misbehaves:
 
-3. **The three CitrineSim simulators** — each was pointed at
-   `ws://<old-ip>:8081`. Reconnect each one from its own UI (`Connection`
-   panel → Central System URL → Connect), or via `POST /api/connect` with
-   `{"centralSystemUrl": "ws://<new-ip>:8081", "stationId": "..."}`.
+1. **`apps/operator-ui/.env.local`** — the host in `NEXT_PUBLIC_API_URL`,
+   `NEXT_PUBLIC_WS_URL`, `NEXT_PUBLIC_CITRINE_CORE_URL`,
+   `NEXT_PUBLIC_FILE_SERVER_URL`, `NEXTAUTH_URL`, `NEXT_PUBLIC_KEYCLOAK_URL`.
+   These are baked into the browser bundle at *build* time, so the script
+   rebuilds the UI — a restart alone wouldn't pick them up.
+2. **`docker-compose.override.yml`** — `KC_HOSTNAME`. Must match
+   `NEXT_PUBLIC_KEYCLOAK_URL` exactly, or Keycloak issues tokens with an
+   `iss` claim the UI won't accept. Only applies when the keycloak
+   container is *recreated*, which the script's second `up -d` does — a
+   build scoped to `citrine-ui` alone does not, and the running container
+   silently keeps the old value.
+
+It replaces whatever host is there (an old IP or the tracked `localhost`),
+rather than a fixed search string: a `sed` for `localhost` only works on
+the very first deploy, after which the files hold the previous IP. It
+leaves the secrets alone and refuses to run while they're still
+`REPLACE_WITH_GENERATED_*` placeholders. **Never commit the server's copies
+of these files back** — the tracked versions must stay on placeholders.
+
+The simulator container is unaffected: it reaches the CSMS by service name
+(`ws://citrine:8081`), not by IP.
 
 ## Common issues
 

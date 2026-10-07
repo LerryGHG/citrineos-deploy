@@ -51,6 +51,9 @@ dist
 # Database dumps from scripts/backup-db.sh — contain real data, never commit
 /backups
 
+# Written by scripts/set-server-ip.sh on the server after a successful run
+/.deployed-ip
+
 # IntelliJ
 out/
 

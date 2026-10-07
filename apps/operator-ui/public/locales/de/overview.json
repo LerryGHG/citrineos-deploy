@@ -31,6 +31,17 @@
     "notCharging": "Kein Ladevorgang",
     "batteryLevel": "Akkustand",
     "unknown": "Unbekannt",
-    "offline": "Offline"
+    "offline": "Offline",
+    "chargersWithStatus": "Ladestationen: {status}",
+    "chargerStatus": {
+      "charging": "Lädt",
+      "chargingSuspended": "Laden pausiert",
+      "preparing": "Wird vorbereitet",
+      "available": "Verfügbar",
+      "unavailable": "Nicht verfügbar",
+      "faulted": "Gestört",
+      "offline": "Offline",
+      "online": "Online"
+    }
   }
 }

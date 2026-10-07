@@ -24,6 +24,7 @@ import { PercentageCircle } from '@lib/client/pages/overview/percentage-circle/p
 import { ChargerStatusEnum } from '@lib/utils/enums';
 import { OverviewCardSkeleton } from '@lib/client/pages/overview/overview-card-skeleton';
 import { AccessDeniedFallbackCard } from '@lib/client/components/access-denied-fallback-card';
+import { useChargerStatusLabel } from '@lib/client/pages/overview/charger-status-label';
 
 interface ChargerItem {
   station: ChargingStationDto;
@@ -184,6 +185,7 @@ export const ChargerActivityCard: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<Array<ChargerItem>>([]);
   const [stationsSheetOpen, setStationsSheetOpen] = useState(false);
   const translate = useTranslate();
+  const statusLabel = useChargerStatusLabel();
 
   const {
     query: { data, isLoading, error },
@@ -268,7 +270,9 @@ export const ChargerActivityCard: React.FC = () => {
                       color={getStatusColor[status]}
                     />
                   </div>
-                  <span className="text-center text-[13px] leading-tight">{status}</span>
+                  <span className="text-center text-[13px] leading-tight">
+                    {statusLabel(status)}
+                  </span>
                 </div>
               ))}
             </div>

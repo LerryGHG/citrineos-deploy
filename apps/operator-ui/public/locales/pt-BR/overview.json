@@ -31,6 +31,17 @@
     "notCharging": "Não carregando",
     "batteryLevel": "Nível da bateria",
     "unknown": "Desconhecido",
-    "offline": "Offline"
+    "offline": "Offline",
+    "chargersWithStatus": "Carregadores: {status}",
+    "chargerStatus": {
+      "charging": "Carregando",
+      "chargingSuspended": "Carregamento suspenso",
+      "preparing": "Preparando",
+      "available": "Disponível",
+      "unavailable": "Indisponível",
+      "faulted": "Com falha",
+      "offline": "Offline",
+      "online": "Online"
+    }
   }
 }

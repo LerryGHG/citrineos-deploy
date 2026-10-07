@@ -26,6 +26,7 @@ import {
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useCardLabels } from '@lib/client/hooks/use-card-labels';
 import { useLiveCurrent } from '@lib/client/hooks/use-live-current';
+import { useChargerStatusLabel } from '@lib/client/pages/overview/charger-status-label';
 
 const REFRESH_MS = 5000;
 
@@ -109,6 +110,7 @@ const sortRank = (station: GridStation): number => {
 export const StationsGridCard: React.FC = () => {
   const { push } = useRouter();
   const translate = useTranslate();
+  const statusLabel = useChargerStatusLabel();
   const { describe } = useCardLabels();
   const { pointsByStation, colorFor } = useLiveCurrent();
 
@@ -215,7 +217,7 @@ export const StationsGridCard: React.FC = () => {
                           <Badge variant="muted">{translate('Overview.offline')}</Badge>
                         ) : chargerStatus ? (
                           <Badge variant="outline" className={getStatusColor[chargerStatus]}>
-                            {chargerStatus}
+                            {statusLabel(chargerStatus)}
                           </Badge>
                         ) : (
                           <Badge variant="muted">{translate('Overview.unknown')}</Badge>

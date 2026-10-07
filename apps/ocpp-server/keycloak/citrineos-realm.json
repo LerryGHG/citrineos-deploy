@@ -46,7 +46,14 @@
   "roles": {
     "client": {
       "citrineos-ui": [
-        { "name": "admin", "description": "Full access to the operator UI" },
+        {
+          "name": "admin",
+          "description": "Full access to the operator UI, including its Users page",
+          "composite": true,
+          "composites": {
+            "client": { "realm-management": ["view-users", "manage-users", "view-realm"] }
+          }
+        },
         { "name": "user", "description": "View-only access to the operator UI" }
       ]
     }

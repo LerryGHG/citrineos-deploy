@@ -16,7 +16,11 @@ It seeds:
   into a top-level `roles` claim of the access token. Hasura and the CSMS API
   both read the role from there (see RUNBOOK.md, "Accounts and what they can
   do"); the operator UI reads `resource_access.citrineos-ui.roles`.
-- Two client roles, `admin` (full access) and `user` (view only).
+- Two client roles, `admin` (full access) and `user` (view only). `admin`
+  includes realm-management's `view-users`, `manage-users` and `view-realm`,
+  so the operator UI's Users page can call Keycloak's admin API with the
+  signed-in admin's own token. The `roles` mapper only copies `citrineos-ui`
+  roles, so these don't reach Hasura or the CSMS.
 - Two users, `admin` and `user`, one per role.
 
 The client secret and both passwords are `${...}` placeholders. Keycloak

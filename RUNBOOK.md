@@ -170,7 +170,7 @@ until it's recreated. It hardly logs anything, so that doesn't matter.
 
 | Role | Can |
 |---|---|
-| `admin` | Everything: edit stations, locations, cards, tariffs; send commands to stations. |
+| `admin` | Everything: edit stations, locations, cards, tariffs; send commands to stations; set passwords on the **Users** page. |
 | `user` | View only: dashboard, stations, transactions, cost calculator, reports, card names. Can't change anything or send commands. |
 
 The role comes from the Keycloak account's client role on `citrineos-ui`, and
@@ -190,6 +190,32 @@ Tokens carry the role in a top-level `roles` claim, added by a protocol
 mapper on the `citrineos-ui` client (in the realm file). To change what
 `user` may do, change all three places together.
 
+### Changing a login password
+
+Operator UI -> **Users** (admins only) -> **Change password**. Each password
+rule is checked while you type, and Save stays disabled until the password
+passes them all. If Keycloak still refuses it, its reason stays in the
+dialog, marked "The password was NOT changed". The rules are read from the
+realm's password policy (currently at least 8 characters, not the username or
+email), so they always match what Keycloak enforces.
+
+Keycloak's own console can do this too (Users -> user -> Credentials -> Reset
+password), but when a password breaks the policy it only flashes a popup for
+a few seconds and saves nothing. Five logins with the password that was
+never saved then lock the account for up to 15 minutes.
+
+The Users page calls Keycloak's admin API with the signed-in admin's own
+token, so the citrineos-ui `admin` role needs three Keycloak permissions. A
+realm created from the current realm file has them. A realm created before
+that (any server set up before 2026-10-07) needs this once, otherwise the
+page says Keycloak doesn't allow it yet:
+
+Keycloak console -> realm **citrineos** -> Clients -> **citrineos-ui** ->
+Roles -> **admin** -> Action (top right) -> **Add associated roles** ->
+switch the filter to client roles -> tick **realm-management**
+`view-users`, `manage-users` and `view-realm` -> Assign. Then log out of the
+operator UI and back in.
+
 ### Adding / managing users
 
 Keycloak console -> realm dropdown -> **citrineos** (not `master`) -> **Users**.
@@ -199,7 +225,7 @@ Keycloak console -> realm dropdown -> **citrineos** (not `master`) -> **Users**.
   Role mapping -> Assign role -> filter by client `citrineos-ui` -> `admin` or
   `user`.
 - **Revoke access**: toggle **Enabled** off, or delete the user.
-- **Change a password**: Credentials -> Reset password. (The
+- **Change a password**: easier from the operator UI, see above. (The
   `CITRINEOS_*_PASSWORD` values in `.env` only seed a brand-new realm.)
 
 ## Secrets

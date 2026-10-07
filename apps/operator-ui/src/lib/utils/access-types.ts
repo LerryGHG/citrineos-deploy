@@ -49,6 +49,8 @@ export enum ResourceType {
   SERVER_NETWORK_PROFILES = 'ServerNetworkProfiles',
   PARTNERS = 'TenantPartners',
   TENANTS = 'Tenants',
+  /** Keycloak accounts (the Users page); admin only, see access-control-provider. */
+  USERS = 'Users',
 }
 
 export enum ActionType {

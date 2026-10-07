@@ -15,6 +15,7 @@ import {
   Home,
   MapPin,
   Receipt,
+  UserCog,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -25,7 +26,8 @@ import { ThemeToggle } from '@lib/client/components/theme-toggle';
 import { LocaleSwitcher } from '@lib/client/components/locale-switcher';
 import { ConnectionModal } from '@lib/client/components/modals/shared/connection-modal/connection-modal';
 import { LogoutButton } from '@lib/client/components/logout-button';
-import { useTranslate } from '@refinedev/core';
+import { useCan, useTranslate } from '@refinedev/core';
+import { ActionType, ResourceType } from '@lib/utils/access-types';
 
 export enum MenuSection {
   OVERVIEW = 'overview',
@@ -35,6 +37,7 @@ export enum MenuSection {
   TRANSACTIONS = 'transactions',
   TARIFFS = 'tariffs',
   PARTNERS = 'partners',
+  USERS = 'users',
 }
 
 export interface MainMenuProps {
@@ -52,6 +55,7 @@ export const MainMenu = ({ activeSection }: MainMenuProps) => {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const menuRef = useRef<HTMLElement>(null);
   const translate = useTranslate();
+  const { data: usersAccess } = useCan({ resource: ResourceType.USERS, action: ActionType.LIST });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -99,6 +103,16 @@ export const MainMenu = ({ activeSection }: MainMenuProps) => {
       label: translate('Cars.menuLabel'),
       icon: <Users className={sidebarIconSize} />,
     },
+    // Admins only: logins and passwords.
+    ...(usersAccess?.can
+      ? [
+          {
+            key: `/${MenuSection.USERS}`,
+            label: translate('Users.menuLabel'),
+            icon: <UserCog className={sidebarIconSize} />,
+          },
+        ]
+      : []),
   ];
 
   return (

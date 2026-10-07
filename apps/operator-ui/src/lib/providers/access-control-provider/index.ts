@@ -6,6 +6,7 @@ import {
   ActionType,
   type ListCanReturnType,
   type OperatorCanParams,
+  ResourceType,
 } from '@lib/utils/access-types';
 import type { AccessControlProvider, CanReturnType } from '@refinedev/core';
 
@@ -46,6 +47,13 @@ const ROLE_PERMISSIONS = {
   },
 };
 
+/**
+ * Resources only admins may see at all, not just change. For Users this is
+ * enforced twice more: the server actions require the admin role, and
+ * Keycloak checks the admin's own token.
+ */
+const ADMIN_ONLY_RESOURCES = new Set<string>([ResourceType.USERS]);
+
 export const createAccessProvider = <TPermissions = unknown>(
   config: AccessProviderConfig<TPermissions>,
 ): AccessControlProvider => {
@@ -74,6 +82,13 @@ export const createAccessProvider = <TPermissions = unknown>(
         return {
           can: false,
           reason: 'User has no valid role assigned',
+        };
+      }
+
+      if (resource && ADMIN_ONLY_RESOURCES.has(resource) && userRole !== 'admin') {
+        return {
+          can: false,
+          reason: `Only admins can access '${resource}'`,
         };
       }
 

@@ -122,7 +122,7 @@ go away for good on a PC, install Caddy's root certificate there:
 
 ```bash
 # on the server - copy this file to the PC
-/home/maw/citrineos/apps/ocpp-server/data/caddy/pki/authorities/local/root.crt
+/home/maw/citrineos/apps/ocpp-server/data/caddy/caddy/pki/authorities/local/root.crt
 ```
 
 On Windows: double-click it -> Install Certificate -> Local Machine -> "Place

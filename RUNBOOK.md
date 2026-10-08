@@ -62,6 +62,7 @@ cp scripts/docker-daemon.json /etc/docker/daemon.json && systemctl restart docke
 C="docker compose -f docker-compose.yml -f docker-compose.local.yml -f docker-compose.override.yml --profile ui"
 $C build citrine citrine-ui  # both are built from this repo, never pulled
 $C up -d
+cp scripts/systemd/citrineos-ip.* /etc/systemd/system/ && systemctl daemon-reload && systemctl enable --now citrineos-ip.timer  # follows IP changes
 ```
 
 Note the three passwords `init-env.sh` prints (`kcadmin`, `admin`, `user`) in
@@ -98,21 +99,36 @@ If the server came back with a **different IP**, see the next section.
 
 ## When the server's IP changes
 
+**Handled automatically.** The `citrineos-ip` systemd timer runs
+`scripts/set-server-ip.sh` 30 seconds after boot and every 5 minutes after
+that. When the IP is unchanged it does nothing. When it has changed, the UI
+is at the new address about 3 minutes later; until then the new address
+shows a blank page. That's the only symptom.
+
+What the script does: it sets `SERVER_IP` in `.env`, rebuilds the UI (its
+URLs are baked in at build time) and recreates the services that derive from
+it - Keycloak (`KC_HOSTNAME`, which ends up in every token) and the proxy
+(its certificate is for the IP; requests for any other address get an empty
+page). Browsers show the certificate warning again for the new address unless
+the root certificate is installed (see "HTTPS"). The simulator container is
+unaffected: it reaches the CSMS by service name (`ws://citrine:8081`).
+
 ```bash
-/home/maw/citrineos/scripts/set-server-ip.sh            # detects the IP
-/home/maw/citrineos/scripts/set-server-ip.sh 10.40.2.48 # or name it
+journalctl -u citrineos-ip -n 30                         # what it did, and when
+systemctl list-timers citrineos-ip                       # next check
+/home/maw/citrineos/scripts/set-server-ip.sh             # run it by hand
+/home/maw/citrineos/scripts/set-server-ip.sh 10.40.2.48  # or name the IP
 ```
 
-It sets `SERVER_IP` in `.env`, rebuilds the UI (its URLs are baked in at
-build time) and recreates the services that derive from it - Keycloak
-(`KC_HOSTNAME`, which ends up in every token) and the proxy (its certificate
-is for the IP). Re-running it for the same IP does nothing. Browsers will
-show the certificate warning again for the new address unless the root
-certificate is installed (see "HTTPS").
+Installing the timer (done on the current server; needed again on a new one):
 
-A DHCP reservation (or static IP) for the server would remove this step
-entirely. The simulator container is unaffected: it reaches the CSMS by
-service name (`ws://citrine:8081`).
+```bash
+cp /home/maw/citrineos/scripts/systemd/citrineos-ip.* /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now citrineos-ip.timer
+```
+
+A DHCP reservation (or static IP) for the server would make the IP change
+itself go away.
 
 ## HTTPS
 

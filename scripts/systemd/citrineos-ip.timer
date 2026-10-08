@@ -1,0 +1,11 @@
+# At boot, then every 5 minutes: the check is a few milliseconds when the IP
+# is unchanged, and also catches an address that changes without a reboot.
+[Unit]
+Description=Check the server's IP for CitrineOS
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

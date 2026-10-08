@@ -1,0 +1,15 @@
+# Re-points the stack at the server's current IP if it changed (DHCP).
+# Started by citrineos-ip.timer; does nothing when the IP is unchanged.
+# Install: see RUNBOOK.md, "When the server's IP changes".
+[Unit]
+Description=Point CitrineOS at the server's current IP address
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+Environment=HOME=/root
+ExecStart=/home/maw/citrineos/scripts/set-server-ip.sh
+# Rebuilding the UI takes a few minutes; don't let a stuck build hang forever.
+TimeoutStartSec=30min

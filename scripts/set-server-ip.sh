@@ -18,6 +18,9 @@
 # Safe to re-run: if SERVER_IP already matches and the last successful run
 # was for the same address, it does nothing. FORCE=1 rebuilds anyway (e.g.
 # after a run that failed half-way).
+#
+# The citrineos-ip systemd timer (scripts/systemd) runs it at boot and every
+# 5 minutes, so an IP change normally needs no one to log in.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,10 +33,27 @@ MARKER=".deployed-ip"
 # The source address of the default route is the one other machines reach
 # us on; `hostname -I` order isn't guaranteed (Docker bridges are in it too).
 default_ip() {
-  ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($i == "src") { print $(i + 1); exit }}'
+  # `|| true`: with no route yet, `ip` fails and pipefail would end the script.
+  ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($i == "src") { print $(i + 1); exit }}' || true
 }
-ip="${1:-$(default_ip)}"
-ip="${ip:-$(hostname -I | awk '{print $1}')}"
+# Fallback for a network without a default route: the first global address
+# on an interface that isn't one of Docker's.
+first_host_ip() {
+  ip -4 -o addr show scope global | awk '$2 !~ /^(docker|br-|veth)/ {split($4, a, "/"); print a[1]; exit}' || true
+}
+
+if [ -n "${1:-}" ]; then
+  ip="$1"
+else
+  # At boot the network may not be up yet; give DHCP a minute.
+  ip=""
+  for _ in $(seq 30); do
+    ip="$(default_ip)"
+    [ -n "$ip" ] && break
+    sleep 2
+  done
+  ip="${ip:-$(first_host_ip)}"
+fi
 if ! [[ "$ip" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]]; then
   echo "Not an IPv4 address: '${ip}'" >&2
   exit 1

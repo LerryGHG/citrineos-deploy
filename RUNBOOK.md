@@ -162,9 +162,11 @@ is full:
   gzipped, so no container's logs can exceed 250 MB. The CSMS logs every OCPP
   message (about 55 MB a day with the four simulators), so `docker logs`
   goes back roughly four days for it and much longer for everything else.
-- **Build cache**: kept under 10 GB. Docker's default only starts clearing it
-  at about 75% of the disk, and it had reached 40 GB. `docker builder prune`
-  clears it completely; the next build then takes longer.
+- **Build cache**: kept under 25 GB. Docker's default only starts clearing it
+  at about 75% of the disk, and it had reached 40 GB. 10 GB proved too
+  little: the two images' dependency layers pushed each other out, so every
+  rebuild downloaded all npm packages again. `docker builder prune` clears it
+  completely; the next build then takes longer.
 
 `docker system df` shows what's using space. To change the settings, edit
 the file in the repo and copy it over again. A Docker restart is needed, and

@@ -78,10 +78,13 @@ elif [ "$(cat "$MARKER" 2>/dev/null)" = "$ip" ] && [ "${FORCE:-0}" != "1" ]; the
 fi
 
 echo "Rebuilding the UI and recreating changed services (takes a few minutes) ..."
+# `build citrine-ui`, not `up --build citrine-ui`: the latter also rebuilds
+# the services the UI depends on - the CSMS among them, whose recreation
+# disconnects every charger for no reason.
 # shellcheck disable=SC2086
-docker compose $COMPOSE_FILES up -d --build citrine-ui
-# The UI build only touches services it depends on; this picks up the rest,
-# in particular keycloak and the proxy, whose settings only apply on recreate.
+docker compose $COMPOSE_FILES build citrine-ui
+# Recreates what the IP change affects: the UI (new image), keycloak and the
+# proxy (their settings only apply on recreate).
 # shellcheck disable=SC2086
 docker compose $COMPOSE_FILES up -d
 

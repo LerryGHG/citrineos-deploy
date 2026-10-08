@@ -9,7 +9,7 @@
     "gc": {
       "enabled": true,
       "defaultReservedSpace": "2GB",
-      "defaultMaxUsedSpace": "10GB",
+      "defaultMaxUsedSpace": "25GB",
       "defaultMinFreeSpace": "20GB"
     }
   }

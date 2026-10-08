@@ -5,6 +5,7 @@
 import { test, expect } from '../../fixtures';
 import { AuthorizationsListPage } from '../../pages/authorizations/list-page';
 import { AuthorizationFormPage } from '../../pages/authorizations/form-page';
+import { ConfirmDelete } from '../../pages/components/confirm-delete-po';
 import { deleteAuthorization } from '../../fixtures/seeded-data';
 import { shortId } from '../../utils/random';
 
@@ -101,9 +102,7 @@ test.describe('authorizations › CRUD', () => {
 
     try {
       await page.goto(`/authorizations/${created.id}`);
-      const deleteButton = page.getByRole('button', { name: /^delete/i });
-      await expect(deleteButton).toBeVisible({ timeout: 30_000 });
-      await deleteButton.click();
+      await new ConfirmDelete(page).confirm(new RegExp(`delete authorization ${idToken}\\?`, 'i'));
 
       await page.waitForURL(/\/authorizations$/, { timeout: 30_000 });
       const list = new AuthorizationsListPage(page);

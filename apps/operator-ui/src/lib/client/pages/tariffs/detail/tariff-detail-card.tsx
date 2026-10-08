@@ -13,8 +13,9 @@ import { KeyValueDisplay } from '@lib/client/components/key-value-display';
 import { CanAccess, useTranslate } from '@refinedev/core';
 import { ActionType, ResourceType } from '@lib/utils/access-types';
 import { NOT_APPLICABLE } from '@lib/utils/consts';
-import { ChevronLeft, Edit, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, Edit, Pencil } from 'lucide-react';
 import { Button } from '@lib/client/components/ui/button';
+import { ConfirmDeleteButton } from '@lib/client/components/buttons/confirm-delete-button';
 import { buttonIconSize } from '@lib/client/styles/icon';
 import { useDelete } from '@refinedev/core';
 import { useRouter } from 'next/navigation';
@@ -76,10 +77,10 @@ export const TariffDetailCard = ({ tariff }: TariffDetailCardProps) => {
             action={ActionType.DELETE}
             params={{ id: tariff.id }}
           >
-            <Button variant="destructive" size="sm" onClick={handleDelete}>
-              <Trash2 className={buttonIconSize} />
-              {translate('buttons.delete')}
-            </Button>
+            <ConfirmDeleteButton
+              title={translate('Tariffs.deleteTitle', { id: tariff.id })}
+              onConfirm={handleDelete}
+            />
           </CanAccess>
         </div>
       </CardHeader>

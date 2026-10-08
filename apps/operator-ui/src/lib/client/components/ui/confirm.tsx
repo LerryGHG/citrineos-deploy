@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@lib/client/components/ui/alert-dialog';
-import type { buttonVariants } from '@lib/client/components/ui/button';
+import { buttonVariants } from '@lib/client/components/ui/button';
 import { LoadingIcon } from '@lib/client/components/ui/loading';
 import { type AlertDialogProps } from '@radix-ui/react-alert-dialog';
 import { useTranslation } from '@refinedev/core';
@@ -48,6 +48,7 @@ export const ConfirmDialog: FC<ConfirmDialogProps> = ({
   onConfirm,
   okIcon,
   cancelIcon,
+  okButtonVariant,
   open,
   onOpenChange,
   defaultOpen,
@@ -88,7 +89,11 @@ export const ConfirmDialog: FC<ConfirmDialogProps> = ({
             {cancelText ?? translate('buttons.cancel')}
             {cancelIconSide === 'right' && CancelIcon}
           </AlertDialogCancel>
-          <AlertDialogAction disabled={loading} onClick={onConfirm}>
+          <AlertDialogAction
+            disabled={loading}
+            onClick={onConfirm}
+            className={okButtonVariant ? buttonVariants({ variant: okButtonVariant }) : undefined}
+          >
             {okIconSide === 'left' && OkIcon}
             {okText ?? translate('buttons.ok')}
             {okIconSide === 'right' && OkIcon}

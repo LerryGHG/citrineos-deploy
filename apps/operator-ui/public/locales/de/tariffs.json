@@ -57,6 +57,7 @@
   "Tariffs": {
     "Tariffs": "Tarife",
     "tariff": "Tarif",
+    "deleteTitle": "Tarif #{id} löschen?",
     "noDataFound": "Kein Tarif mit der ID {id} gefunden.",
     "columns": {
       "id": "ID",

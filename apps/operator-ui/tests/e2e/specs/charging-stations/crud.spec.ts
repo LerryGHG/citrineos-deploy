@@ -5,6 +5,7 @@
 import { test, expect } from '../../fixtures';
 import { ChargingStationsListPage } from '../../pages/charging-stations/list-page';
 import { ChargingStationFormPage } from '../../pages/charging-stations/form-page';
+import { ConfirmDelete } from '../../pages/components/confirm-delete-po';
 import { deleteStation } from '../../fixtures/seeded-data';
 import { shortId } from '../../utils/random';
 
@@ -100,13 +101,7 @@ test.describe('charging-stations › CRUD', () => {
 
     try {
       await page.goto(`/charging-stations/${created.id}`);
-      const deleteButton = page.getByRole('button', { name: /^delete/i });
-      await expect(deleteButton).toBeEnabled({ timeout: 30_000 });
-      // The button asks for confirmation with a native window.confirm().
-      // Playwright dismisses unhandled dialogs, which is Cancel - so without
-      // this the station is never deleted and the redirect never comes.
-      page.once('dialog', (dialog) => dialog.accept());
-      await deleteButton.click();
+      await new ConfirmDelete(page).confirm(new RegExp(`delete station ${name}\\?`, 'i'));
 
       await page.waitForURL(/\/charging-stations$/, { timeout: 30_000 });
       const list = new ChargingStationsListPage(page);

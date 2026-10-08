@@ -11,7 +11,8 @@ import { Button } from '@lib/client/components/ui/button';
 import { AUTHORIZATIONS_DELETE_MUTATION } from '@lib/queries/authorizations';
 import { ActionType, ResourceType } from '@lib/utils/access-types';
 import { CanAccess, useDelete, useTranslate } from '@refinedev/core';
-import { ChevronLeft, Edit, Trash2 } from 'lucide-react';
+import { ChevronLeft, Edit } from 'lucide-react';
+import { ConfirmDeleteButton } from '@lib/client/components/buttons/confirm-delete-button';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@lib/client/components/ui/card';
 import { cardGridStyle, cardHeaderFlex } from '@lib/client/styles/card';
@@ -83,10 +84,10 @@ export const AuthorizationDetailCard: React.FC<AuthorizationDetailCardProps> = (
             action={ActionType.DELETE}
             params={{ id: authorization.id }}
           >
-            <Button variant="destructive" size="sm" onClick={handleDeleteClick}>
-              <Trash2 className={buttonIconSize} />
-              {translate('buttons.delete')}
-            </Button>
+            <ConfirmDeleteButton
+              title={translate('Authorizations.deleteTitle', { idToken: authorization.idToken })}
+              onConfirm={handleDeleteClick}
+            />
           </CanAccess>
         </div>
       </CardHeader>

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { test, expect } from '../../fixtures';
+import { ConfirmDelete } from '../../pages/components/confirm-delete-po';
 import { CostCalculatorPage } from '../../pages/cost-calculator/cost-calculator-page';
 import { TariffFormPage } from '../../pages/tariffs/form-page';
 
@@ -71,9 +72,7 @@ test.describe('tariffs › CRUD', () => {
 
     try {
       await page.goto(`/tariffs/${created.id}`);
-      const deleteButton = page.getByRole('button', { name: /^delete/i });
-      await expect(deleteButton).toBeVisible({ timeout: 30_000 });
-      await deleteButton.click();
+      await new ConfirmDelete(page).confirm(new RegExp(`delete tariff #${created.id}\\?`, 'i'));
 
       // Deleting redirects to the resource's list route, which is now the
       // cost calculator - so check the row is gone in the database instead.
@@ -91,6 +90,41 @@ test.describe('tariffs › CRUD', () => {
            }`,
           { id: created.id },
         )
+        .catch(() => undefined);
+    }
+  });
+
+  test('E2E-114: Cancelling the delete confirmation keeps the tariff', async ({
+    page,
+    apiClient,
+  }) => {
+    const now = new Date().toISOString();
+    const { insert_Tariffs_one: created } = await apiClient.gql<{
+      insert_Tariffs_one: { id: number };
+    }>(
+      `mutation SeedForUiCancel($obj: Tariffs_insert_input!) {
+         insert_Tariffs_one(object: $obj) { id }
+       }`,
+      { obj: { currency: 'XTS', pricePerKwh: 0.5, createdAt: now, updatedAt: now } },
+    );
+
+    try {
+      await page.goto(`/tariffs/${created.id}`);
+      const confirmDelete = new ConfirmDelete(page);
+      await confirmDelete.open(new RegExp(`delete tariff #${created.id}\\?`, 'i'));
+      await confirmDelete.cancelButton.click();
+      await expect(confirmDelete.dialog).toBeHidden();
+
+      await expect(page).toHaveURL(new RegExp(`/tariffs/${created.id}$`));
+      const { Tariffs_by_pk: kept } = await apiClient.gql<{
+        Tariffs_by_pk: { id: number } | null;
+      }>(`query TariffKept($id: Int!) { Tariffs_by_pk(id: $id) { id } }`, { id: created.id });
+      expect(kept).not.toBeNull();
+    } finally {
+      await apiClient
+        .gql(`mutation Cleanup($id: Int!) { delete_Tariffs_by_pk(id: $id) { id } }`, {
+          id: created.id,
+        })
         .catch(() => undefined);
     }
   });

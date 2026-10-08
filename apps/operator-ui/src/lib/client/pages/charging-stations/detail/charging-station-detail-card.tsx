@@ -31,7 +31,8 @@ import { openModal } from '@lib/utils/store/modal-slice';
 import { getPlainToInstanceOptions } from '@lib/utils/tables';
 import { CanAccess, Link, useDelete, useList, useOne, useTranslate } from '@refinedev/core';
 import { instanceToPlain } from 'class-transformer';
-import { ChevronLeft, Edit, Info, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react';
+import { ChevronLeft, Edit, Info, MoreHorizontal, RefreshCw } from 'lucide-react';
+import { ConfirmDeleteButton } from '@lib/client/components/buttons/confirm-delete-button';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -110,13 +111,6 @@ export const ChargingStationDetailCard = ({
 
   const handleDeleteClick = useCallback(() => {
     if (!station) return;
-    if (
-      !window.confirm(
-        translate('ChargingStations.confirmDelete', { name: station.ocppConnectionName }),
-      )
-    ) {
-      return;
-    }
 
     mutate(
       {
@@ -132,7 +126,7 @@ export const ChargingStationDetailCard = ({
         },
       },
     );
-  }, [station, mutate, push, translate]);
+  }, [station, mutate, push]);
 
   const showForceDisconnectModal = useCallback(
     (station: ChargingStationDto) => {
@@ -247,10 +241,13 @@ export const ChargingStationDetailCard = ({
             action={ActionType.DELETE}
             params={{ id: station.id }}
           >
-            <Button variant="destructive" size="sm" onClick={handleDeleteClick}>
-              <Trash2 className={buttonIconSize} />
-              {translate('buttons.delete')}
-            </Button>
+            <ConfirmDeleteButton
+              title={translate('ChargingStations.deleteTitle', {
+                name: station.ocppConnectionName,
+              })}
+              description={translate('ChargingStations.deleteDescription')}
+              onConfirm={handleDeleteClick}
+            />
           </CanAccess>
         </div>
       </CardHeader>

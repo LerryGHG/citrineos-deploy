@@ -2,6 +2,7 @@
   "Authorizations": {
     "Authorizations": "Autorisierungen",
     "authorization": "Autorisierung",
+    "deleteTitle": "Autorisierung {idToken} löschen?",
     "noDataFound": "Keine Autorisierung mit der ID {id} gefunden.",
     "noId": "Keine ID",
     "allowed": "Erlaubt",
